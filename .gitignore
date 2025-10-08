@@ -364,6 +364,7 @@ docs/_book
 # TODO: where does this rule come from?
 **/test/**/application.properties
 
+
 ### Vuejs ###
 # Recommended template: Node.gitignore
 
