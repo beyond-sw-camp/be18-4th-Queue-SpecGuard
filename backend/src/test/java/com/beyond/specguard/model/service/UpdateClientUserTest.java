@@ -6,6 +6,7 @@ import com.beyond.specguard.company.common.model.repository.ClientCompanyReposit
 import com.beyond.specguard.company.common.model.repository.ClientUserRepository;
 import com.beyond.specguard.company.management.model.dto.request.UpdateUserRequestDto;
 import com.beyond.specguard.company.management.model.service.UserService;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
+@Rollback(false)
 public class UpdateClientUserTest {
     @Autowired
     private UserService userService;
@@ -36,21 +38,27 @@ public class UpdateClientUserTest {
 
         ClientUser user = clientUserRepository.save(
                 ClientUser.builder()
+
                         .name("김택곤")
                         .email("test@beyond.com")
-                        .phone("010-1111-2222")
+                        .phone("01011112222")
                         .company(company)
                         .build()
         );
 
         UpdateUserRequestDto dto = UpdateUserRequestDto.builder()
                 .name("김태곤")
-                .phone("010-9999-8888")
+                .phone("01099998888")
                 .build();
+
+        // when
+        userService.updateMyInfo(user.getId(), dto);
 
         // then
         ClientUser updated = clientUserRepository.findById(user.getId()).orElseThrow();
         assertThat(updated.getName()).isEqualTo("김태곤");
         assertThat(updated.getPhone()).isEqualTo("010-9999-8888");
+
+        System.out.println("수정 완료: " + updated.getName() + ", " + updated.getPhone());
     }
 }
