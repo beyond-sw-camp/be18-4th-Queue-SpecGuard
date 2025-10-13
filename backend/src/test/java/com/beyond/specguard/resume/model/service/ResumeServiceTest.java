@@ -114,4 +114,60 @@ class ResumeServiceTest {
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining("해당 템플릿을 찾을 수 없습니다.");
     }
+    // 여기부터 get 테스트 구현했어요.
+    @DisplayName("✅ 저장 후 조회 시 데이터 일관성 유지 확인")
+    @Test
+    void createAndGetConsistency() {
+        // given
+        UUID templateId = UUID.randomUUID();
+        ResumeCreateRequest req = new ResumeCreateRequest(
+                templateId, "홍길동", "01012345678", "hong@example.com", "pw1234"
+        );
+
+        CompanyTemplate template = mock(CompanyTemplate.class);
+        Resume resume = mock(Resume.class);
+        given(template.getId()).willReturn(templateId);
+        given(resume.getEmail()).willReturn("hong@example.com");
+        // NullPointerException 방지를 위함.
+        given(resume.getTemplate()).willReturn(template);
+        given(resumeRepository.findById(any())).willReturn(Optional.of(resume));
+        given(resumeRepository.existsByEmailAndTemplateId(req.email(), templateId)).willReturn(false);
+        given(companyTemplateRepository.findById(templateId)).willReturn(Optional.of(template));
+        given(passwordEncoder.encode(anyString())).willReturn("encoded_pw");
+        given(resumeRepository.saveAndFlush(any())).willReturn(resume);
+
+        // when
+        ResumeResponse created = resumeService.create(req);
+        ResumeResponse fetched = resumeService.get(UUID.randomUUID(), "hong@example.com");
+
+        // then
+        assertThat(fetched.email()).isEqualTo(created.email());
+        verify(resumeRepository, atLeastOnce()).findById(any());
+    }
+
+    @DisplayName("❌ 중복 이메일로 저장 시 트랜잭션 롤백 검증")
+    @Test
+    void createDuplicateEmailRollback() {
+        // given
+        UUID templateId = UUID.randomUUID();
+        ResumeCreateRequest req = new ResumeCreateRequest(
+                templateId, "홍길동", "01012345678", "dup@specguard.com", "pw1234"
+        );
+
+        CompanyTemplate template = mock(CompanyTemplate.class);
+        given(companyTemplateRepository.findById(templateId)).willReturn(Optional.of(template));
+
+        // 중복 이메일 시도 상황 시뮬레이션
+        given(resumeRepository.existsByEmailAndTemplateId(req.email(), templateId)).willReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> resumeService.create(req))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining("해당 이메일은 이미 사용중입니다.");
+
+        // 저장 로직이 아예 실행되지 않아야 함
+        verify(resumeRepository, never()).saveAndFlush(any());
+        verify(passwordEncoder, never()).encode(any());
+    }
+
 }
