@@ -83,8 +83,6 @@ dependencies {
 
     // WebDriverManager (ChromeDriver 자동 다운로드)
     implementation 'io.github.bonigarcia:webdrivermanager:5.5.0'
-
-
 }
 
 
