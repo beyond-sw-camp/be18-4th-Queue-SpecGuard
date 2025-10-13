@@ -55,9 +55,10 @@ class ResumeServiceTest {
         given(companyTemplateRepository.findById(templateId)).willReturn(Optional.of(templateMock));
         given(resumeRepository.existsByEmailAndTemplateId(req.email(), templateId)).willReturn(false);
         given(passwordEncoder.encode(anyString())).willReturn("encoded_pw");
+        // saveAndFlush()는 중복 저장, 중복 호출을 방지함. => 정확히 한 번만 호출하는 지 점검합니다.
         given(resumeRepository.saveAndFlush(any(Resume.class))).willReturn(saved);
 
-        // when
+        // when) ResumeResponse가 null이 아닌 지, 정상적으로 엔티티를 반환하는 지 확인.
         ResumeResponse result = resumeService.create(req);
 
         // then
@@ -83,6 +84,7 @@ class ResumeServiceTest {
         given(companyTemplateRepository.findById(templateId))
                 .willReturn(Optional.of(templateMock));
 
+        // existByEmailAndTemplateID()가 true면, 이메일이 중복될 수 있으니까. 막아야 줘야 함.
         given(resumeRepository.existsByEmailAndTemplateId(req.email(), templateId)).willReturn(true);
 
         // when & then
@@ -95,6 +97,7 @@ class ResumeServiceTest {
     @Test
     void createTemplateNotFoundThrows() {
         // given
+        // ResumeCreateRequest.java 파일 보니까, templateId를 받더라고요. (스펙가드에서는 안 썼던 것 같은데, 잘 모르겠네여)
         UUID templateId = UUID.randomUUID();
         ResumeCreateRequest req = new ResumeCreateRequest(
                 templateId,
