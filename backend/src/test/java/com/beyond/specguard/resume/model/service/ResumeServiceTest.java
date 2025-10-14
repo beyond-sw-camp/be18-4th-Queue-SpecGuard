@@ -4,9 +4,11 @@ import com.beyond.specguard.common.exception.CustomException;
 import com.beyond.specguard.companytemplate.model.entity.CompanyTemplate;
 import com.beyond.specguard.companytemplate.model.repository.CompanyTemplateRepository;
 import com.beyond.specguard.resume.exception.errorcode.ResumeErrorCode;
+import com.beyond.specguard.resume.model.dto.request.ResumeCertificateUpsertRequest;
 import com.beyond.specguard.resume.model.dto.request.ResumeCreateRequest;
 import com.beyond.specguard.resume.model.dto.response.ResumeResponse;
 import com.beyond.specguard.resume.model.entity.Resume;
+import com.beyond.specguard.resume.model.entity.ResumeCertificate;
 import com.beyond.specguard.resume.model.repository.ResumeRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -168,6 +173,53 @@ class ResumeServiceTest {
         // 저장 로직이 아예 실행되지 않아야 함
         verify(resumeRepository, never()).saveAndFlush(any());
         verify(passwordEncoder, never()).encode(any());
+    }
+
+    // 여기서부터, 이력서 자격증 upsert 테스트
+        @DisplayName("🌀 이미 존재하는 자격증 정보는 업데이트된다")
+        @Test
+        void upsertCertificates_updateExisting_success() {
+        // given
+        UUID resumeId = UUID.randomUUID();
+        UUID templateId = UUID.randomUUID();
+        UUID certId = UUID.randomUUID();
+        String email = "hong@example.com";
+
+        Resume resume = mock(Resume.class);
+        ResumeCertificate existingCert = mock(ResumeCertificate.class);
+        CompanyTemplate template = mock(CompanyTemplate.class);
+
+        // ✅ 상태를 명시적으로 설정해줘야 함 (NullPointerException 방지)
+        given(resume.getStatus()).willReturn(Resume.ResumeStatus.DRAFT);
+        given(resume.getEmail()).willReturn(email);
+
+        // ✅ template mock 설정 (NPE 방지 핵심 부분)
+        given(template.getId()).willReturn(templateId);
+        given(resume.getTemplate()).willReturn(template);
+        
+        // DTO의 ID와 동일하게 설정해야합니다. 다르면, update()가 호출 안됨. (기존 ID와 같아야, 같은 자격증으로 인식되니까용)
+        given(existingCert.getId()).willReturn(certId);
+
+        // request 준비
+        ResumeCertificateUpsertRequest.Item dto = new ResumeCertificateUpsertRequest.Item(
+                certId,
+                "정보처리기사",
+                "A-1111",
+                "한국산업인력공단",
+                LocalDate.of(2024, 5, 10)
+        );
+        ResumeCertificateUpsertRequest req = new ResumeCertificateUpsertRequest(List.of(dto));
+
+        given(resumeRepository.findById(resumeId)).willReturn(Optional.of(resume));
+        // List.of()로 만든 리스트는 수정 불가능해서, Unsupported그 오류 발생함.
+        given(resume.getResumeCertificates()).willReturn(new ArrayList<>(List.of(existingCert)));
+
+        // when
+        resumeService.upsertCertificates(resumeId, templateId, email, req);
+
+        // then
+        verify(existingCert, times(1)).update(dto);
+        verify(resumeRepository, times(1)).saveAndFlush(resume);
     }
 
 }
