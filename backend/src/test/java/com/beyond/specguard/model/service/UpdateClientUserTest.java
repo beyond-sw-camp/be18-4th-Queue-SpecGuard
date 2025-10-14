@@ -6,59 +6,64 @@ import com.beyond.specguard.company.common.model.repository.ClientCompanyReposit
 import com.beyond.specguard.company.common.model.repository.ClientUserRepository;
 import com.beyond.specguard.company.management.model.dto.request.UpdateUserRequestDto;
 import com.beyond.specguard.company.management.model.service.UserService;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@Transactional
-@Rollback(false)
-public class UpdateClientUserTest {
-    @Autowired
-    private UserService userService;
+@ExtendWith(MockitoExtension.class)
+class UpdateClientUserTest {
 
-    @Autowired
-    private ClientCompanyRepository clientCompanyRepository;
-
-    @Autowired
+    @Mock
     private ClientUserRepository clientUserRepository;
 
+    @Mock
+    private ClientCompanyRepository clientCompanyRepository;
+
+    @InjectMocks
+    private UserService userService;
+
     @Test
-    @DisplayName("유저 정보 수정 통합 테스트")
+    @DisplayName("유저 정보 수정 단위 테스트")
     void updateUser_success() {
         // given
-        ClientCompany company = clientCompanyRepository.save(
-                ClientCompany.builder().name("Beyond Systems").build()
-        );
+        UUID userId = UUID.randomUUID();
+        ClientCompany company = ClientCompany.builder()
+                .name("Beyond Systems")
+                .build();
 
-        ClientUser user = clientUserRepository.save(
-                ClientUser.builder()
-
-                        .name("김택곤")
-                        .email("test@beyond.com")
-                        .phone("01011112222")
-                        .company(company)
-                        .build()
-        );
+        ClientUser user = ClientUser.builder()
+                .id(userId)
+                .name("기존 이름")
+                .email("test@beyond.com")
+                .phone("01011112222")
+                .company(company)
+                .role(ClientUser.Role.MANAGER)
+                .build();
 
         UpdateUserRequestDto dto = UpdateUserRequestDto.builder()
-                .name("김태곤")
+                .name("수정 후 이름")
                 .phone("01099998888")
                 .build();
 
+        when(clientUserRepository.findById(userId)).thenReturn(Optional.of(user));
+
         // when
-        userService.updateMyInfo(user.getId(), dto);
+        userService.updateMyInfo(userId, dto);
 
         // then
-        ClientUser updated = clientUserRepository.findById(user.getId()).orElseThrow();
-        assertThat(updated.getName()).isEqualTo("김태곤");
-        assertThat(updated.getPhone()).isEqualTo("010-9999-8888");
+        assertThat(user.getName()).isEqualTo("수정 후 이름");
+        assertThat(user.getPhone()).isEqualTo("01099998888");
 
-        System.out.println("수정 완료: " + updated.getName() + ", " + updated.getPhone());
+        verify(clientUserRepository, times(1)).findById(userId);
+        System.out.println(" 수정 완료: " + user.getName() + ", " + user.getPhone());
     }
 }
