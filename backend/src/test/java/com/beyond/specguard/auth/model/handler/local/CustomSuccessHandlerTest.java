@@ -16,11 +16,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
+import org.mockito.ArgumentCaptor;  // 상단 import 꼭 추가
+
 
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
+// ✅ companyUser 이후 Mock 설정이 꼬이는 것 같아 Mock 초기화 로직 추가
 
 class CustomSuccessHandlerTest {
 
@@ -43,6 +47,7 @@ class CustomSuccessHandlerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        reset(jwtUtil, redisTokenService, response, authentication); // 💡 mock 리셋 추가
 
         mockCompany = ClientCompany.builder()
                 .slug("testcorp")
@@ -59,7 +64,7 @@ class CustomSuccessHandlerTest {
     }
 
     @Test
-    @DisplayName("✅ 기업 사용자 로그인 성공 시 AccessToken, RefreshToken, 쿠키, Redis 저장 검증")
+    @DisplayName("기업 사용자 로그인 성공 시 AccessToken, RefreshToken, 쿠키, Redis 저장 검증")
     void onAuthenticationSuccess_companyUser() throws Exception {
         // given
         when(authentication.getPrincipal()).thenReturn(userDetails);
@@ -67,9 +72,13 @@ class CustomSuccessHandlerTest {
         when(jwtUtil.createRefreshToken("user@test.com")).thenReturn("refresh-token");
 
         when(jwtUtil.getJti("access-token")).thenReturn("jti-uuid");
-        when(jwtUtil.getExpiration("access-token")).thenReturn(new Date(System.currentTimeMillis() + 60000)); // 1분
-        when(jwtUtil.getExpiration("refresh-token")).thenReturn(new Date(System.currentTimeMillis() + 120000)); // 2분
-
+//        when(jwtUtil.getExpiration("access-token")).thenReturn(new Date(System.currentTimeMillis() + 60000)); // 1분
+//        when(jwtUtil.getExpiration("refresh-token")).thenReturn(new Date(System.currentTimeMillis() + 120000)); // 2분
+        // ✅ 올바른 토큰 이름으로 Stub 지정
+        when(jwtUtil.getExpiration("access-token"))
+                .thenReturn(new Date(System.currentTimeMillis() + 60000)); // 1분
+        when(jwtUtil.getExpiration("refresh-token"))
+                .thenReturn(new Date(System.currentTimeMillis() + 120000)); // 2분
         // when
         successHandler.onAuthenticationSuccess(null, response, authentication);
 
@@ -108,10 +117,21 @@ class CustomSuccessHandlerTest {
         when(jwtUtil.createAccessToken("admin@test.com", "MASTER", null)).thenReturn("access-token-admin");
         when(jwtUtil.createRefreshToken("admin@test.com")).thenReturn("refresh-token-admin");
         when(jwtUtil.getJti("access-token-admin")).thenReturn("jti-admin");
-        when(jwtUtil.getExpiration(anyString())).thenReturn(new Date(System.currentTimeMillis() + 60000));
+//        when(jwtUtil.getExpiration(anyString())).thenReturn(new Date(System.currentTimeMillis() + 60000));
+
+        // ✅ 모든 토큰에 대해 만료시간 동일하게 반환
+        when(jwtUtil.getExpiration(contains("access-token-admin")))
+                .thenReturn(new Date(System.currentTimeMillis() + 60000));
+        when(jwtUtil.getExpiration(contains("refresh-token-admin")))
+                .thenReturn(new Date(System.currentTimeMillis() + 120000));
 
         // when
         successHandler.onAuthenticationSuccess(null, response, authentication);
+
+        // ✅ 추가: ArgumentCaptor로 실제 호출된 토큰 인자 확인
+        org.mockito.ArgumentCaptor<String> captor = org.mockito.ArgumentCaptor.forClass(String.class);
+        verify(jwtUtil, atLeastOnce()).getExpiration(captor.capture());
+        System.out.println("[DEBUG] getExpiration called with: " + captor.getAllValues());
 
         // then
         verify(jwtUtil).createAccessToken("admin@test.com", "MASTER", null);

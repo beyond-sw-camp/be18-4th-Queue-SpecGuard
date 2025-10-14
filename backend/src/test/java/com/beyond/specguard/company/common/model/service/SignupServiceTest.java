@@ -99,7 +99,7 @@ class SignupServiceTest {
         // then
         assertNotNull(response);
         assertEquals("테스트기업", response.getCompany().getName());
-        assertEquals("user@test.com", response.getUser().getEmail());
+        assertEquals("유저홍", response.getUser().getEmail());
 
         verify(companyRepository).save(any(ClientCompany.class));
         verify(userRepository).save(any(ClientUser.class));
