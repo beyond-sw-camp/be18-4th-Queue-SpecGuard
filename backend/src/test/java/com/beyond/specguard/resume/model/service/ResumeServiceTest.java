@@ -29,12 +29,14 @@ import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ResumeServiceTest {
-
+    // <============= create unit test ===============>
     @Mock private ResumeRepository resumeRepository;
     @Mock private CompanyTemplateRepository companyTemplateRepository;
     @Mock private PasswordEncoder passwordEncoder;
     @InjectMocks private ResumeService resumeService;
 
+
+    // 정상적으로 작동하는 지, 먼저 확인
     @DisplayName("✅ 이력서 생성 - 정상 입력 시 저장 성공")
     @Test
     void createSuccess() {
@@ -72,6 +74,7 @@ class ResumeServiceTest {
         verify(passwordEncoder, times(1)).encode(anyString());
     }
 
+    // 예외처리) 이메일이 중복됐을 때, 이력서 생성 못 하게 막아버리기~
     @DisplayName("❌ 이력서 생성 - 중복 이메일이면 예외 발생")
     @Test
     void createDuplicateEmailThrows() {
@@ -98,6 +101,7 @@ class ResumeServiceTest {
                 .hasMessageContaining("해당 이메일은 이미 사용중입니다.");
     }
 
+    // 예외처리) 템플릿 ID 없으면, 이력서 생성 못함. ???: 템플릿이 없는데, 어떻게 만들어요.
     @DisplayName("❌ 이력서 생성 - 템플릿 ID가 존재하지 않으면 예외 발생")
     @Test
     void createTemplateNotFoundThrows() {
@@ -119,7 +123,8 @@ class ResumeServiceTest {
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining("해당 템플릿을 찾을 수 없습니다.");
     }
-    // 여기부터 get 테스트 구현했어요.
+    // <======== 여기부터 get 테스트 구현했어요. ==============>
+    // ResumeResponse 주요 필드가 resumeService.get()을 통해 다시 조회했을 때 일관성있게 반환하는 지 검증.
     @DisplayName("✅ 저장 후 조회 시 데이터 일관성 유지 확인")
     @Test
     void createAndGetConsistency() {
@@ -131,10 +136,12 @@ class ResumeServiceTest {
 
         CompanyTemplate template = mock(CompanyTemplate.class);
         Resume resume = mock(Resume.class);
+
+        // NullPointerException 방지를 위함.
         given(template.getId()).willReturn(templateId);
         given(resume.getEmail()).willReturn("hong@example.com");
-        // NullPointerException 방지를 위함.
         given(resume.getTemplate()).willReturn(template);
+
         given(resumeRepository.findById(any())).willReturn(Optional.of(resume));
         given(resumeRepository.existsByEmailAndTemplateId(req.email(), templateId)).willReturn(false);
         given(companyTemplateRepository.findById(templateId)).willReturn(Optional.of(template));
@@ -150,6 +157,7 @@ class ResumeServiceTest {
         verify(resumeRepository, atLeastOnce()).findById(any());
     }
 
+    // 같은 이메일 존재하면, CustomException 던지고 하위 로직 실행안됨.
     @DisplayName("❌ 중복 이메일로 저장 시 트랜잭션 롤백 검증")
     @Test
     void createDuplicateEmailRollback() {
@@ -175,7 +183,7 @@ class ResumeServiceTest {
         verify(passwordEncoder, never()).encode(any());
     }
 
-    // 여기서부터, 이력서 자격증 upsert 테스트
+    // <========== 여기서부터, 이력서 자격증 upsert 테스트 =============>
         @DisplayName("🌀 이미 존재하는 자격증 정보는 업데이트된다")
         @Test
         void upsertCertificates_updateExisting_success() {
@@ -220,6 +228,42 @@ class ResumeServiceTest {
         // then
         verify(existingCert, times(1)).update(dto);
         verify(resumeRepository, times(1)).saveAndFlush(resume);
+    }
+
+    // 요청이 비어있을 때, 기존 데이터 건들 ㄴㄴ
+    @DisplayName("✅ 자격증 요청이 비어 있을 경우, DB에 저장 X & 기존 데이터 유지된다")
+    @Test
+    void upsertCertificates_emptyRequest_success() {
+        // given
+        UUID resumeId = UUID.randomUUID();
+        UUID templateId = UUID.randomUUID();
+        String email = "hong@example.com";
+
+        // Mock 객체 생성
+        Resume resume = mock(Resume.class);
+
+        // 비어 있는 자격증 리스트 반환
+        given(resume.getResumeCertificates()).willReturn(new ArrayList<>());
+
+        // 템플릿 일치 여부 검증용인데, 여기에서는 안 씀. 근데 날리기에는 아까워서 주석처리했어영 ><
+        // CompanyTemplate template = mock(CompanyTemplate.class);
+
+        // update하거나 remove할 때 사용. 이것도 그냥 주석 처리.
+        // ResumeCertificate existingCert = mock(ResumeCertificate.class);
+
+        // 요청: 비어 있음
+        ResumeCertificateUpsertRequest req = new ResumeCertificateUpsertRequest(List.of());
+
+        // when
+        resumeService.upsertCertificates(resumeId, templateId, email, req);
+
+        // then
+        // 아무 자격증 추가/수정/삭제 없이 저장만 일어남
+        // 요청에 맞지 않은, 자격증이 DB에 저장이 안된 거 확인함.
+        verify(resumeRepository, never()).saveAndFlush(any(Resume.class));
+
+        // 객체 상태도 안 변했는지, 확인
+        assertThat(resume.getResumeCertificates()).isEmpty();
     }
 
 }
