@@ -1,49 +1,67 @@
 package com.beyond.specguard.model.service;
 
 import com.beyond.specguard.company.common.model.entity.ClientCompany;
+import com.beyond.specguard.company.common.model.entity.ClientUser;
 import com.beyond.specguard.company.common.model.repository.ClientCompanyRepository;
+import com.beyond.specguard.company.common.model.repository.ClientUserRepository;
 import com.beyond.specguard.company.management.model.service.CompanyService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@Transactional
-@Rollback(false)
-public class DeleteClientCompanyTest {
-    @Autowired
-    private CompanyService companyService;
+@ExtendWith(MockitoExtension.class)
+class DeleteClientCompanyTest {
 
-    @Autowired
+    @Mock
     private ClientCompanyRepository clientCompanyRepository;
 
+    @Mock
+    private ClientUserRepository clientUserRepository;
+
+    @InjectMocks
+    private CompanyService companyService;
+
     @Test
-    @DisplayName("회사 삭제 통합 테스트")
+    @DisplayName("회사 삭제 단위 테스트")
     void deleteClientCompany_success() {
         // given
-        ClientCompany company = clientCompanyRepository.save(
-                ClientCompany.builder()
-                        .name("Beyond Systems")
-                        .contactEmail("test@beyond.com")
-                        .contactMobile("01012345678")
-                        .build()
-        );
+        UUID userId = UUID.randomUUID();
+        ClientCompany company = ClientCompany.builder()
+                .id(UUID.randomUUID())
+                .slug("beyond")
+                .name("Beyond Systems")
+                .contactEmail("test@beyond.com")
+                .contactMobile("01012345678")
+                .build();
+
+        ClientUser user = ClientUser.builder()
+                .id(userId)
+                .role(ClientUser.Role.OWNER)
+                .company(company)
+                .build();
+
+        when(clientCompanyRepository.findBySlug("beyond"))
+                .thenReturn(Optional.of(company));
+        when(clientUserRepository.findById(userId))
+                .thenReturn(Optional.of(user));
 
         // when
-        companyService.deleteCompany(company.getSlug(), company.getId());
+        companyService.deleteCompany("beyond", userId);
 
         // then
-        Optional<ClientCompany> deleted = clientCompanyRepository.findById(company.getId());
-        assertThat(deleted).isEmpty();
+        verify(clientCompanyRepository, times(1)).findBySlug("beyond");
+        verify(clientUserRepository, times(1)).findById(userId);
+        verify(clientUserRepository, times(1)).deleteAllByCompanyId(company.getId());
+        verify(clientCompanyRepository, times(1)).delete(company);
 
-        System.out.println("회사 삭제 완료: " + company.getName());
+        System.out.println(" 회사 삭제 완료: " + company.getName());
     }
 }
