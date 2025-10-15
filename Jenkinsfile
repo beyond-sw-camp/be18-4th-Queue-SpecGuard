@@ -20,7 +20,7 @@ pipeline {
                     -   name: docker-socket
                         mountPath: "/var/run/docker.sock"
                 -   name: python
-                    image: python:3.11-alpine
+                    image: python:3.13.7-alpine3.22
                     command: ["cat"]
                     tty: true
                 volumes:
@@ -57,8 +57,6 @@ pipeline {
                     dir("${PYTHON_DIR}") {
                         sh '''
                         pip install poetry
-                        python --version
-                        poetry run python --version
                         poetry install --no-root
                         echo "Python server build (dependency install) completed."
                         '''
