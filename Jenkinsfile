@@ -40,25 +40,30 @@ pipeline {
     }
 
     stages {
-        stage('Java Backend Build') {
-            steps {
-                container('gradle') {
-                    dir("${JAVA_DIR}") {
-                        sh 'chmod +x ./gradlew'
-                        sh './gradlew clean bootJar'
-                    }
-                }
-            }
-        }
+        // stage('Java Backend Build') {
+        //     steps {
+        //         container('gradle') {
+        //             dir("${JAVA_DIR}") {
+        //                 sh 'chmod +x ./gradlew'
+        //                 sh './gradlew clean bootJar'
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Python Server Build') {
             steps {
                 container('python') {
                     dir("${PYTHON_DIR}") {
                         sh '''
+                        apt-get update && apt-get install -y --no-install-recommends \
+                            build-essential python3-dev libffi-dev curl && \
+                            rm -rf /var/lib/apt/lists/*
+
+                        pip install --upgrade pip
                         pip install poetry
                         poetry lock --no-cache --regenerate
-                        poetry install --no-root
+                        poetry install --only main --no-root
                         echo "Python server build (dependency install) completed."
                         '''
                     }
