@@ -20,7 +20,7 @@ pipeline {
                     -   name: docker-socket
                         mountPath: "/var/run/docker.sock"
                 -   name: python
-                    image: python:3.13.7-alpine3.22
+                    image: python:3.13-slim
                     command: ["cat"]
                     tty: true
                 volumes:
