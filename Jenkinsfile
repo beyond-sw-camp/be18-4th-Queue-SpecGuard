@@ -57,7 +57,8 @@ pipeline {
                     dir("${PYTHON_DIR}") {
                         sh '''
                         pip install poetry
-                        poetry install --no-root --regenerate
+                        poetry lock --no-cache --regenerate
+                        poetry install --no-root
                         echo "Python server build (dependency install) completed."
                         '''
                     }
