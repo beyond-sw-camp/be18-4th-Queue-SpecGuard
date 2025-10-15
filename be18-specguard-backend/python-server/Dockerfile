@@ -12,9 +12,10 @@ ENV POETRY_VIRTUALENVS_CREATE=false \
 
 # 의존성 설치 (빌드 캐시 최적화)
 COPY pyproject.toml poetry.lock ./
-RUN poetry install --no-root --only main
 RUN python --version
 RUN poetry run python --version
+
+RUN poetry install --no-root --only main
 # 실제 코드 복사
 COPY . .
 
