@@ -29,6 +29,8 @@ dependencies = [
 ]
 
 [tool.poetry]
+name = "pythonbackend"
+version = "0.1.0"
 packages = [{ include = "app" }] 
 
 [tool.poetry.group.dev.dependencies]
