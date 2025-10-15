@@ -87,7 +87,7 @@ pipeline {
                         // === Java 이미지 빌드 ===
                         dir("${JAVA_DIR}") {
                             sh """
-                            docker build -t ${JAVA_IMAGE_NAME}:${buildNumber} .
+                            docker build --no-cache -t ${JAVA_IMAGE_NAME}:${buildNumber} .
                             docker push ${JAVA_IMAGE_NAME}:${buildNumber}
                             """
                         }
@@ -95,7 +95,7 @@ pipeline {
                         // === Python 이미지 빌드 ===
                         dir("${PYTHON_DIR}") {
                             sh """
-                            docker build -t ${PYTHON_IMAGE_NAME}:${buildNumber} .
+                            docker build --no-cache -t ${PYTHON_IMAGE_NAME}:${buildNumber} .
                             docker push ${PYTHON_IMAGE_NAME}:${buildNumber}
                             """
                         }
