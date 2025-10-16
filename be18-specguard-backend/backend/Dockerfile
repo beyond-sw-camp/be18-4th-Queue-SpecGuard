@@ -7,6 +7,8 @@ WORKDIR /app
 # 프로젝트 전체 복사
 COPY ./ /app
 
+RUN chmod +x gradlew
+
 # Gradle 빌드 (테스트 제외)
 RUN ./gradlew clean build -x test
 

@@ -40,16 +40,16 @@ pipeline {
     }
 
     stages {
-        // stage('Java Backend Build') {
-        //     steps {
-        //         container('gradle') {
-        //             dir("${JAVA_DIR}") {
-        //                 sh 'chmod +x ./gradlew'
-        //                 sh './gradlew clean bootJar'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Java Backend Build') {
+            steps {
+                container('gradle') {
+                    dir("${JAVA_DIR}") {
+                        sh 'chmod +x ./gradlew'
+                        // sh './gradlew clean bootJar'
+                    }
+                }
+            }
+        }
 
         stage('Python Server Build') {
             steps {
