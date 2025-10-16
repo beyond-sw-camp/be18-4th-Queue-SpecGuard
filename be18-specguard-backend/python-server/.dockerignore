@@ -4,6 +4,8 @@ __pycache__/
 *.pyo
 *.pyd
 *.egg-info/
+
+# 빌드/배포 관련
 dist/
 build/
 
@@ -23,6 +25,10 @@ build/
 .gitignore
 .gitattributes
 README.md
+
+# 테스트, 문서 등 런타임에 불필요한 파일
+tests/
+docs/
 
 # === OS/에디터 캐시 ===
 .DS_Store
