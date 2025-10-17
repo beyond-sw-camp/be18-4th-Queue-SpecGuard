@@ -35,8 +35,8 @@ pipeline {
         JAVA_IMAGE_NAME = 'viroovr/specguard-api'
         PYTHON_IMAGE_NAME = 'viroovr/specguard-nlp'
         DOCKER_CREDENTIALS_ID = 'dockerhub-access'
-        JAVA_DIR = 'backend'
-        PYTHON_DIR = 'python-server'
+        JAVA_DIR = 'be18-specguard-backend/backend'
+        PYTHON_DIR = 'be18-specguard-backend/python-server'
     }
 
     stages {

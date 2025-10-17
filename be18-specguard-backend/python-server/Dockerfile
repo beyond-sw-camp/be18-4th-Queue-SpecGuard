@@ -23,7 +23,7 @@ COPY pyproject.toml poetry.lock ./
 
 # 의존성 설치 (main only, no root)
 RUN poetry install --only main --no-root
-#
+
 # 소스 복사
 COPY . .
 
