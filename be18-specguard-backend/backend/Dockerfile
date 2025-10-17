@@ -1,15 +1,35 @@
 # ===============================
-# Runtime Image
+# Stage 1: Build
 # ===============================
-FROM eclipse-temurin:21-jre-alpine
+FROM gradle:9.1.0-jdk21-alpine AS builder
+WORKDIR /app
+
+# 프로젝트 전체 복사
+COPY . .
+
+RUN chmod +x gradlew
+
+# Gradle 빌드 (테스트 제외)
+RUN ./gradlew clean build -x test
+
+# ===============================
+# Stage 2: Run
+# ===============================
+FROM eclipse-temurin:21-jre-alpine-3.22
 
 WORKDIR /app
 
-# 빌드된 jar 복사
-COPY /app/build/libs/*.jar app.jar
+ARG BUILD_PROFILE=default
+ARG BUILD_PORT=8080
 
-# 포트 설정 (Spring Boot 기본 8080)
-EXPOSE 8080
+# Build 단계에서 생성된 Jar 파일 복사
+COPY --from=builder /app/build/libs/*.jar app.jar
 
-# 실행
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENV TZ=Asia/Seoul
+ENV APP_PROFILE=${BUILD_PROFILE}
+
+# 앱 포트
+EXPOSE ${BUILD_PORT}
+
+# Spring Boot 실행
+ENTRYPOINT ["sh", "-c", "java -jar app.jar --spring.profiles.active=${APP_PROFILE}"]
