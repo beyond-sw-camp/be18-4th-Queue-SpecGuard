@@ -33,7 +33,7 @@ public class CrawlingCompletionScheduler {
     private final ReentrantLock lock = new ReentrantLock();
 
     // === 3분마다 실행: cutoff 기준 최근 변경된 Resume만 ===
-    @Scheduled(fixedDelay = 210000)
+    @Scheduled(fixedDelay = 10_800_000)
     public void checkRecent() {
         if (!lock.tryLock()) {
             log.warn("[Recent] 이전 실행 중 → 스킵");
