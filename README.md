@@ -1,14 +1,15 @@
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Noto+Sans+KR&weight=900&size=48&duration=2300&pause=900&color=00FF7F&background=00000000&center=true&vCenter=true&width=1000&lines=SpecGuard;%EC%9D%B4%EB%A0%A5+%EA%B2%80%EC%A6%9D+%EC%8B%9C%EC%8A%A4%ED%85%9C" alt="SpecGuard Typing">
+  <img src="https://readme-typing-svg.demolab.com?font=Noto+Sans+KR&weight=900&size=48&duration=2300&pause=900&color=E1A925&background=00000000&center=true&vCenter=true&width=1000&lines=Queue;" alt="SpecGuard Typing">
 </p>
 
-
+# CI/CD 발표자료
+https://docs.google.com/presentation/d/1qshOqG2RWEBWa9YqodJfumGWBgeQHwxH4nFSYmgzR4k/edit?usp=sharing
 
 ## 👥팀원  
 
 | 서현원 | 김택곤 | 육세윤 | 이인화 | 김대의 |
 | :---: | :---: | :---: | :---: | :---: |
-|  <img src="docs/images/현원님.png"  width="100"/> | <img src="docs/images/택곤님.png"  width="100"/>  |  <img src="docs/images/이원진.png"  width="100"/>  |  <img src="docs/images/인화님.png"  width="100"/> | <img src="docs/images/상원님.png"  width="100"/>  |
+|  <img src="docs/images/서현원.jpg"  width="100"/> | <img src="docs/images/김택곤.jpg"  width="100"/>  |  <img src="docs/images/육세윤.jpg"  width="100"/>  |  <img src="docs/images/이인화.jpg"  width="100"/> | <img src="docs/images/김대의.jpg"  width="100"/>  |
 |<a href="https://github.com/viroovr" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | <a href="https://github.com/dobbyRR" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | <a href="https://github.com/KorSwib" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | <a href="https://github.com/Inhwa1003" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | <a href="https://github.com/kimeodml" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | 
 
 ## 📚 목차
@@ -126,13 +127,14 @@
 ![Notion](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white)
 ![Figma](https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white)
 ![Velog](https://img.shields.io/badge/Velog-20C997?style=for-the-badge&logo=velog&logoColor=white)
+<img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=Discord&logoColor=white">
   <a href="https://www.erdcloud.com" target="_blank"> <img src="https://img.shields.io/badge/ERD%20Cloud-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white"/> </a>
 
 #**CI/CD**
-<br>![Jenkins](https://img.shields.io/badge/Jenkins-181717?style=for-the-badge&logo=jenkins&logoColor=white)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-181717?style=for-the-badge&logo=kubernetes&logoColor=white)
-![ArgoCD](https://img.shields.io/badge/ArgoCD-181717?style=for-the-badge&logo=ArgoCD&logoColor=white)
-
+<br><img src="https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=Jenkins&logoColor=white">
+<img src="https://img.shields.io/badge/kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white">
+<img src="https://img.shields.io/badge/ArgoCD-EF7B4D?style=for-the-badge&logo=Argo&logoColor=white">
+<img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white">
 
 
 
@@ -293,3 +295,12 @@ stage('Build & Push') {
 3. 통계 및 리포트 페이지 구현
 
 <br/>
+
+## 11. 회고록
+|   이 름  | 내용 |
+|--------|--------|
+| 서현원 | CI/CD 개발에 대해 평소 궁금증이 많았고 직접 경험해보고 싶은 마음이 컸습니다. 이번 프로젝트에서 팀원들과 함께 파이프라인을 개발하며 이러한 궁금증을 직접 해결할 수 있었고, 현업에서의 CI/CD 전체 흐름을 큰 그림으로 이해할 수 있었습니다. 덕분에 앞으로 DevOps 엔지니어들과 원활히 소통하거나, 필요시 직접 DevOps 업무를 수행할 자신감이 생겼습니다. 또한 Docker와 Kubernetes를 활용한 환경 구축과 운영에도 적극적으로 적용할 수 있는 역량을 키울 수 있었습니다.  |
+| 김대의 | CI/CD의 경우 vercel 밖에 경험해 본적이 없어서 젠킨스로 진행하는 CI/CD를 해보고 싶다는 생각을 자주 했었습니다. 이번 기회에 프론트엔드의 파이프라인을 구축해보면서 자동 배포의 효율성을 체감해 볼 수 있었고 파이널 때는 github-action으로도 활용해 보고 싶다는 생각이 들었습니다.  |
+| 김택곤 | Jenkins와 ArgoCD, Kubernetes를 이용해 CI/CD 파이프라인을 구축하면서 개발-테스트-배포 흐름을 자동화할 수 있었다. 수동으로 진행하던 빌드와 배포 과정을 자동화하자 시간 낭비가 줄고 오류 발생률이 크게 낮아졌다. Jenkins 파이프라인 설계 단계에서 환경 변수와 빌드 트리거 관리가 가장 까다로웠지만, 구조를 표준화한 뒤에는 유지보수가 훨씬 수월해졌다. 이번 구축을 통해 자동화의 중요성을 체감했고, 코드 품질과 배포 효율을 동시에 개선하는 기반을 마련할 수 있었다. |
+| 육세윤 | 이번 CI/CD 프로젝트를 통해 코드 변경이 자동으로 빌드·배포되는 파이프라인의 중요성과 효율성을 깊이 체감했다. 지속적 통합과 배포를 직접 구현하며 개발 생산성과 협업 안정성을 동시에 확보하는 DevOps를 배울 수 있는 귀중한 기회였다.   |
+| 이인화 | Jenkins 파이프라인을 구성하면서 빌드 단계와 배포 단계가 어떤 순서로 진행되는지, 또 ArgoCD가 어떻게 실제 클러스터 상태를 지속적으로 모니터링하고 동기화하는지 확인할 수 있었습니다. 이 과정을 통해 자동화의 핵심은 단순히 시간을 줄이는 것이 아니라 안정적이고 일관된 배포 흐름을 만드는 것이라는 점을 배웠습니다. |
