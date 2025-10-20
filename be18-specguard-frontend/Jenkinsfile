@@ -45,8 +45,6 @@ pipeline {
                             npm run build
                         '''
                     }
-
-
                 }
             }
         }
@@ -82,13 +80,13 @@ pipeline {
             }
         }
 
-        stage('Trigger specguard-k8s-manifests') {
+        stage('Trigger specguard-frontend-manifests') {
             steps {
                 script {
                     def buildNumber = "${env.BUILD_NUMBER}"
 
                     withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
-                        build job: 'specguard-k8s-manifests', 
+                        build job: 'specguard-frontend-manifests', 
                             parameters: [
                                 string(name: 'DOCKER_IMAGE_VERSION', value: "${DOCKER_IMAGE_VERSION}"),
                                 string(name: 'DID_BUILD_APP', value: "${env.SHOULD_BUILD_APP}")
@@ -108,12 +106,14 @@ pipeline {
                 variable: 'DISCORD_WEBHOOK_URL'
             )]) {
                 discordSend description: """
-                제목 : ${currentBuild.displayName} 빌드
-                결과 : ${currentBuild.result}
-                실행 시간 : ${currentBuild.duration / 1000}s
+                💡 **SpecGuard Frontend CI/CD 알림**
+                🔹 Job : ${env.JOB_NAME}
+                🔹 Build : ${currentBuild.displayName}
+                🔹 결과 : ${currentBuild.currentResult}
+                🔹 실행 시간 : ${currentBuild.duration / 1000}s
                 """,
                 result: currentBuild.currentResult,
-                title: "${env.JOB_NAME} : ${currentBuild.displayName}", 
+                title: "SpecGuard Pipeline : ${currentBuild.displayName}",
                 webhookURL: "${DISCORD_WEBHOOK_URL}"
             }
 

@@ -37,6 +37,7 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'dockerhub-access'
         JAVA_DIR = 'be18-specguard-backend/backend'
         PYTHON_DIR = 'be18-specguard-backend/python-server'
+        DISCORD_WEBHOOK_CREDENTIALS_ID = 'specguard-backend-webhook'
     }
 
     stages {
@@ -144,12 +145,12 @@ pipeline {
             }
         }
 
-        stage('Trigger k8s-manifests job') {
+        stage('Trigger specguard-backend-manifests job') {
             steps {
                 script {
                     def buildNumber = "${env.BUILD_NUMBER}"
                     withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
-                        build job: 'specguard-k8s-manifests',
+                        build job: 'specguard-backend-manifests',
                         parameters: [
                             string(name: 'DOCKER_IMAGE_VERSION', value: buildNumber),
                             string(name: 'DID_BUILD_JAVA', value: "${env.SHOULD_BUILD_JAVA}"),
@@ -165,11 +166,11 @@ pipeline {
     post {
         always {
             withCredentials([string(
-                credentialsId: 'discord-webhook', 
+                credentialsId: DISCORD_WEBHOOK_CREDENTIALS_ID, 
                 variable: 'DISCORD_WEBHOOK_URL'
             )]) {
                 discordSend description: """
-                💡 **SpecGuard CI/CD 알림**
+                💡 **SpecGuard Backend CI/CD 알림**
                 🔹 Job : ${env.JOB_NAME}
                 🔹 Build : ${currentBuild.displayName}
                 🔹 결과 : ${currentBuild.currentResult}
