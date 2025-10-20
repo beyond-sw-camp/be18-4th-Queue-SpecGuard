@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 
@@ -21,6 +22,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
+    @Value("${frontend.base-url}")
+    private String frontendBaseUrl;
     private final JwtUtil jwtUtil;
     private final AppProperties appProperties;
     private final RedisTokenService redisTokenService;
@@ -47,6 +50,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         log.info(" OAuth2 로그인 성공: email={}, RefreshToken 발급 및 Redis 저장 완료", email);
 
         //  프론트엔드로 redirect (AccessToken은 별도 API에서 발급)
-        response.sendRedirect("http://localhost:5173/oauth2/redirect");
+        response.sendRedirect(frontendBaseUrl + "/oauth2/redirect");
     }
 }

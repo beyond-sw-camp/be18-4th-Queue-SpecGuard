@@ -1,0 +1,44 @@
+# === 기본 빌드 산출물 제외 ===
+target/
+build/
+out/
+.gradle/
+
+# === IDE 관련 ===
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# === Git 관련 ===
+.git/
+.gitignore
+.gitattributes
+README.md
+
+# === OS/에디터 캐시 ===
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# === 테스트 및 로그 ===
+*.log
+logs/
+test-output/
+jacoco.exec
+coverage/
+.tmp/
+
+# === 환경 설정 ===
+.env
+*.env
+*.local
+application-*.yml
+application-*.properties
+
+# === Docker 관련 ===
+Dockerfile*
+docker-compose.yml
+.dockerignore
