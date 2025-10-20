@@ -36,7 +36,7 @@ pipeline {
         PYTHON_IMAGE_NAME = 'viroovr/specguard-nlp'
         JAVA_DIR = 'be18-specguard-backend/backend'
         PYTHON_DIR = 'be18-specguard-backend/python-server'
-        
+
         DISCORD_WEBHOOK_CREDENTIALS_ID = 'specguard-backend-webhook'
         DOCKER_CREDENTIALS_ID = 'dockerhub-access'
     }
@@ -180,11 +180,12 @@ pipeline {
                 💡 **SpecGuard Backend CI/CD 알림**
                 🔹 Job : ${env.JOB_NAME}
                 🔹 Build : ${currentBuild.displayName}
+                🔹 Commit : ${env.GIT_COMMIT}
                 🔹 결과 : ${currentBuild.currentResult}
                 🔹 실행 시간 : ${currentBuild.duration / 1000}s
                 """,
                 result: currentBuild.currentResult,
-                title: "SpecGuard Pipeline : ${currentBuild.displayName}",
+                title: "SpecGuard BE Pipeline : ${env.GIT_COMMIT}",
                 webhookURL: "${DISCORD_WEBHOOK_URL}"
             }
         }

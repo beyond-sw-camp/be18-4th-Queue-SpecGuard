@@ -123,11 +123,12 @@ pipeline {
                 💡 **SpecGuard Frontend CI/CD 알림**
                 🔹 Job : ${env.JOB_NAME}
                 🔹 Build : ${currentBuild.displayName}
+                🔹 Commit : ${env.GIT_COMMIT}
                 🔹 결과 : ${currentBuild.currentResult}
                 🔹 실행 시간 : ${currentBuild.duration / 1000}s
                 """,
                 result: currentBuild.currentResult,
-                title: "SpecGuard Pipeline : ${currentBuild.displayName}",
+                title: "SpecGuard FE Pipeline : ${env.GIT_COMMIT}",
                 webhookURL: "${DISCORD_WEBHOOK_URL}"
             }
 
