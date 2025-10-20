@@ -20,9 +20,10 @@
 5. [데이터베이스 설계 (ERD)](#5-데이터베이스-설계-erd)  
 6. [테이블 명세서](#6-테이블-명세서)  
 7. [API 명세서](#7-api-명세서)  
-8. [백엔드 테스트 결과서](#8-백엔드-테스트-결과서)  
-9. [향후 개선 계획](#9-향후-개선-계획)  
-10. [회고록](#10-회고록)
+8. [테스트 결과서](#8-테스트-결과서)
+9. [CI/CD 절차](#9-CI/CD-절차)
+10. [향후 개선 계획](#10-향후-개선-계획)  
+11. [회고록](#11-회고록)
 
 <br/>
 
@@ -127,6 +128,11 @@
 ![Velog](https://img.shields.io/badge/Velog-20C997?style=for-the-badge&logo=velog&logoColor=white)
   <a href="https://www.erdcloud.com" target="_blank"> <img src="https://img.shields.io/badge/ERD%20Cloud-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white"/> </a>
 
+#**CI/CD**
+<br>![Jenkins](https://img.shields.io/badge/Jenkins-181717?style=for-the-badge&logo=jenkins&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-181717?style=for-the-badge&logo=kubernetes&logoColor=white)
+![ArgoCD](https://img.shields.io/badge/ArgoCD-181717?style=for-the-badge&logo=ArgoCD&logoColor=white)
+
 
 
 
@@ -134,7 +140,7 @@
 
 ## 4. 시스템 아키텍처
 
-![시스템 아키텍쳐](docs/images/아키택쳐.png)
+![시스템 아키텍쳐](docs/images/4thPjt_SystemArchitecture.png)
 
 <br/>
 
@@ -166,14 +172,119 @@
 
 
 
-## 8. 백엔드 테스트 결과서
+## 8. 테스트 결과서
 
 [백엔드 테스트 결과서](https://www.notion.so/2775605940ec801286d6f888af3e93d2?v=2775605940ec80ba931c000c1fcfe3ed)
 
+[단위 테스트 결과서](https://www.notion.so/292819b5e8c680959006d4e288e86acd?source=copy_link)
+
+
+<br>
+
+## 9. CI/CD 절차
+### 9-1. 개요 <br>
+프로젝트명: SpecGuard <br>
+프로젝트 유형: 이력서·경력 자동검증 서비스 (Spring Boot + MariaDB + Docker 기반)<br>
+DevOps 목표: 코드 배포 자동화, 안정적 버전관리, 서비스 무중단 운영
+<br>
+### 9-2. 기술 스택 및 선택 이유
+   
+| **구분**           | **기술**               | **선택 이유**                                                                                                                                   |
+| ---------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **컨테이너 오케스트레이션** | **Kubernetes (k8s)** | - Docker 컨테이너의 자동 배포 및 스케일링<br>- Pod 단위 격리로 서비스 안정성 확보<br>- 무중단 롤링 업데이트 및 헬스체크 지원                     |
+| **CI 서버**        | **Jenkins**          | - 오픈소스 CI 툴로 커스터마이징 용이<br>- Spring Boot, Gradle, Docker와 높은 호환성<br>- 파이프라인 스크립트를 통한 유연한 빌드/테스트 자동화<br>- GitHub Webhook 기반 자동 빌드 트리거 가능      |
+| **CD 툴**         | **ArgoCD**           | - GitOps 방식의 CD 지원 (Git 상태 = 실제 배포 상태)<br>- k8s 리소스 변경 자동 감지 및 동기화<br>- UI를 통한 배포 상태 모니터링 및 롤백 지원<br>- Jenkins와의 연동으로 배포 승인/자동화 파이프라인 구성 가능 |
+
+
+### 9-3. CI/CD 파이프라인 절차
+
+#### (1) CI 단계 (Continuous Integration) – Jenkins
+
+1. 개발자가 코드 푸시 → GitHub Webhook Trigger  
+ - develop, main 브랜치 기준으로 자동 감지
+
+2. Jenkins Pipeline 실행  
+ - Jenkinsfile 스크립트 기반  
+ - Gradle 빌드 및 단위 테스트 수행  
+     `./gradlew clean build`
+
+3. 도커 이미지 생성  
+ - DockerFile 기반 이미지 빌드  
+ - 이미지 태그:  
+     - java 서버: `viroovr/specguard-api:(jenkins job id)`  
+     - python 서버: `viroovr/specguard-nlp:(jenkins job id)`  
+     - frontend 서버: `kimeodml/specguard-frontend:(jenkins build no)`
+
+4. 도커 허브 푸시  
+ - Jenkins Credential을 이용해 DockerHub로 이미지 업로드
+
+```groovy
+stage('Build & Push') {
+    sh 'docker build -t viroovr/specguard-api:${GIT_COMMIT} .'
+    sh 'docker push viroovr/specguard-api:${GIT_COMMIT}'
+
+    sh 'docker build -t viroovr/specguard-nlp:${GIT_COMMIT} .'
+    sh 'docker push viroovr/specguard-nlp:${GIT_COMMIT}'
+
+    sh 'docker build -t kimeodml/specguard-frontend:${GIT_COMMIT} .'
+    sh 'docker push kimeodml/specguard-frontend:${GIT_COMMIT}'
+}
+```
+#### (2) CD 단계 (Continuous Deployment) – ArgoCD + Kubernetes <br>
+1. **ArgoCD가 GitOps Repository 모니터링**
+ - GitHub Repository: [specguard-k8s-manifests](https://github.com/kimeodml/specguard-k8s-manifests)
+ - 모니터링 디렉토리 구조:
+     ```
+     specguard-k8s-manifests/
+     ├── specguard-backend/
+     │   ├── java/
+     │   └── python/
+     └── specguard-frontend/
+     ```
+ - 각 서비스별로 Deployment, Service, Ingress 매니페스트 관리
+ - ArgoCD는 각 디렉토리를 개별 Application으로 등록하여 자동 동기화
+
+2. 새로운 이미지 태그 감지 시 자동 배포 <br>
+  - ArgoCD가 k8s 클러스터에 배포 상태를 동기화 <br>
+  - Deployment의 image 필드 변경 감지 → Rolling Update 수행 <br>
+3. 배포 검증 및 롤백 <br>
+  - ArgoCD UI에서 Pod 상태, Sync 상태 확인 <br>
+  - 실패 시 이전 리비전으로 원클릭 롤백 가능 <br>
+4. Argo CD 레포
+
+<details>
+<summary>Argo CD 레포 링크</summary>
+
+[Argo CD 레포 바로가기](https://www.notion.so/CI-CD-292819b5e8c680c78d53fa140f580c25?d=292819b5e8c680dcb63d001c63e194ce&source=copy_link#9aa5f72c33064e0489dba5b6c44849ae)
+
+</details>
+
+
+### 9-4. 장단점 분석
+
+| **구분**         | **장점**                                                             | **단점**                                        |
+| -------------- | ------------------------------------------------------------------ | --------------------------------------------- |
+| **Kubernetes** | - 자동 복구(Self-healing)<br>- 무중단 배포(Rolling Update)<br>- 클라우드 친화적 구조 | - 초기 세팅 복잡<br>- YAML 관리량 많음                   |
+| **Jenkins**    | - 플러그인 다양성<br>- 완전한 빌드 자동화<br>- Webhook 실시간 트리거 가능                 | - UI/구성 복잡<br>- 별도 관리 서버 필요                   |
+| **ArgoCD**     | - GitOps 기반 선언적 배포<br>- 롤백 용이<br>- 실시간 배포 모니터링                     | - 초기 설정 난이도 높음<br>- Git 상태와 실제 배포 불일치 시 혼란 가능 |
+
+### 9-5. 전체 아키텍처 흐름 <br>
+  [개발자] → GitHub → Jenkins (CI) <br>
+  → Docker Build & Push → GitOps Repo 업데이트 <br>
+  → ArgoCD (CD) → Kubernetes Cluster 배포
+<br>
+  CI/CD 흐름 요약: <br>
+  - Git Push 시 자동 빌드 → 이미지 생성/업로드 → k8s 매니페스트 반영 → 자동 배포/모니터링
+
+### 9-6. 결론 <br>
+  본 CI/CD 구조는 개발-테스트-배포의 전 과정을 자동화하여 <br>
+    - 배포시간 단축, 버전 추적성 강화, 장애 발생 시 빠른 롤백 을 가능하게 한다.
+
+    
 <br>
 
 
-## 9. 향후 개선 계획
+## 10. 향후 개선 계획
 
 1. 분석 정확도 개선을 위한 모델 업그레이드
 
