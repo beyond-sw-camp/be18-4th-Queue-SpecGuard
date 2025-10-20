@@ -135,7 +135,7 @@
 
 ## 4. 시스템 아키텍처
 
-![시스템 아키텍쳐](docs/images/아키택쳐.png)
+![시스템 아키텍쳐](docs/images/4thPjt_SystemArchitecture.png)
 
 <br/>
 
