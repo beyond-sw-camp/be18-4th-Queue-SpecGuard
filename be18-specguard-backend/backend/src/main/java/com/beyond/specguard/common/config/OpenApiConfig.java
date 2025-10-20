@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
         info = @Info(
                 title = "SpecGuard API", 
                 description = "SpecGuard API 테스트 문서",
-                version = "v1.0.0"
+                version = "v1.0.1"
         ),
         servers = {
                 @Server(url = "http://localhost:8080", description = "로컬 개발 환경"),
