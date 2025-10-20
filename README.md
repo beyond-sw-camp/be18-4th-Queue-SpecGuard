@@ -9,7 +9,7 @@ https://docs.google.com/presentation/d/1qshOqG2RWEBWa9YqodJfumGWBgeQHwxH4nFSYmgz
 
 | 서현원 | 김택곤 | 육세윤 | 이인화 | 김대의 |
 | :---: | :---: | :---: | :---: | :---: |
-|  <img src="docs/images/서현원.jpg"  width="100"/> | <img src="docs/images/김택곤.jpg"  width="100"/>  |  <img src="docs/images/육세윤.jpg"  width="100"/>  |  <img src="docs/images/이인화.jpg"  width="100"/> | <img src="docs/images/김대의.jpg"  width="100"/>  |
+|  <img src="docs/images/"  width="100"/> | <img src="docs/images/김택곤.jpg"  width="100"/>  |  <img src="docs/images/육세윤.jpg"  width="100"/>  |  <img src="docs/images/"  width="100"/> | <img src="docs/images/김대의.jpg"  width="100"/>  |
 |<a href="https://github.com/viroovr" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | <a href="https://github.com/dobbyRR" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | <a href="https://github.com/KorSwib" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | <a href="https://github.com/Inhwa1003" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | <a href="https://github.com/kimeodml" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | 
 
 ## 📚 목차
