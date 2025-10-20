@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Noto+Sans+KR&weight=900&size=48&duration=2300&pause=900&color=00FF7F&background=00000000&center=true&vCenter=true&width=1000&lines=SpecGuard;%EC%9D%B4%EB%A0%A5+%EA%B2%80%EC%A6%9D+%EC%8B%9C%EC%8A%A4%ED%85%9C" alt="SpecGuard Typing">
+  <img src="https://readme-typing-svg.demolab.com?font=Noto+Sans+KR&weight=900&size=48&duration=2300&pause=900&color=E1A925&background=00000000&center=true&vCenter=true&width=1000&lines=Queue;" alt="SpecGuard Typing">
 </p>
 
 # CI/CD 발표자료
@@ -297,10 +297,10 @@ stage('Build & Push') {
 <br/>
 
 ## 11. 회고록
-| 이름 | 내용 |
-|-------------|--------|
-| 서현원 |  |
+|   이 름  | 내용 |
+|--------|--------|
+| 서현원 | CI/CD 개발에 대해 평소 궁금증이 많았고 직접 경험해보고 싶은 마음이 컸습니다. 이번 프로젝트에서 팀원들과 함께 파이프라인을 개발하며 이러한 궁금증을 직접 해결할 수 있었고, 현업에서의 CI/CD 전체 흐름을 큰 그림으로 이해할 수 있었습니다. 덕분에 앞으로 DevOps 엔지니어들과 원활히 소통하거나, 필요시 직접 DevOps 업무를 수행할 자신감이 생겼습니다. 또한 Docker와 Kubernetes를 활용한 환경 구축과 운영에도 적극적으로 적용할 수 있는 역량을 키울 수 있었습니다.  |
 | 김대의 |  |
 | 김택곤 |  |
-| 육세윤 |  |
-| 이인화 |  |
+| 육세윤 | 이번 CI/CD 프로젝트를 통해 코드 변경이 자동으로 빌드·배포되는 파이프라인의 중요성과 효율성을 깊이 체감했다. 지속적 통합과 배포를 직접 구현하며 개발 생산성과 협업 안정성을 동시에 확보하는 DevOps를 배울 수 있는 귀중한 기회였다.   |
+| 이인화 | Jenkins 파이프라인을 구성하면서 빌드 단계와 배포 단계가 어떤 순서로 진행되는지, 또 ArgoCD가 어떻게 실제 클러스터 상태를 지속적으로 모니터링하고 동기화하는지 확인할 수 있었습니다. 이 과정을 통해 자동화의 핵심은 단순히 시간을 줄이는 것이 아니라 안정적이고 일관된 배포 흐름을 만드는 것이라는 점을 배웠습니다. |
