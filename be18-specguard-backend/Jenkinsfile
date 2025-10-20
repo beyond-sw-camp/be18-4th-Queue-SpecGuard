@@ -34,10 +34,11 @@ pipeline {
     environment {
         JAVA_IMAGE_NAME = 'viroovr/specguard-api'
         PYTHON_IMAGE_NAME = 'viroovr/specguard-nlp'
-        DOCKER_CREDENTIALS_ID = 'dockerhub-access'
         JAVA_DIR = 'be18-specguard-backend/backend'
         PYTHON_DIR = 'be18-specguard-backend/python-server'
+        
         DISCORD_WEBHOOK_CREDENTIALS_ID = 'specguard-backend-webhook'
+        DOCKER_CREDENTIALS_ID = 'dockerhub-access'
     }
 
     stages {
@@ -49,6 +50,11 @@ pipeline {
 
                     // 전체 배열을 줄바꿈으로 출력
                     echo "Changed files:\n${changedFiles.join('\n')}"
+
+                    // 현재 커밋 SHA 추출 (짧은 형태)
+                    env.GIT_COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+
+                    echo "GIT_COMMIT : ${env.GIT_COMMIT}"
 
                     // 환경 변수 동적 설정
                     env.SHOULD_BUILD_JAVA = changedFiles.any { it.startsWith(JAVA_DIR) } ? "true" : "false"
@@ -104,7 +110,7 @@ pipeline {
                 container('docker') {
                     dir(JAVA_DIR) {
                         script {
-                        def buildNumber = "${env.BUILD_NUMBER}"
+                        def buildNumber = "${env.GIT_COMMIT}"
 
                         withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
                                 sh 'docker -v'
@@ -130,7 +136,7 @@ pipeline {
                 container('docker') {
                     dir(PYTHON_DIR) {
                         script {
-                            def buildNumber = "${env.BUILD_NUMBER}"
+                            def buildNumber = "${env.GIT_COMMIT}"
 
                             withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
                                 sh 'docker -v'
@@ -148,7 +154,8 @@ pipeline {
         stage('Trigger specguard-backend-manifests job') {
             steps {
                 script {
-                    def buildNumber = "${env.BUILD_NUMBER}"
+                    def buildNumber = "${env.GIT_COMMIT}"
+
                     withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
                         build job: 'specguard-backend-manifests',
                         parameters: [
