@@ -5,7 +5,7 @@ import refreshApi from "@/api/refresh";
 import router from "@/router";
 
 const api = axios.create({
-    baseURL: "http://localhost:8080/api/v1",
+    baseURL: `${import.meta.env.VITE_API_BASE_URL}/api/v1`,
     withCredentials: true, // Refresh 쿠키 전송 허용
 });
 

@@ -3,7 +3,7 @@ import axios from "axios";
 import router from "@/router";
 
 const applicantApi = axios.create({
-  baseURL: "http://localhost:8080/api/v1",
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api/v1`,
   withCredentials: true, // 세션 쿠키 자동 포함
 });
 
