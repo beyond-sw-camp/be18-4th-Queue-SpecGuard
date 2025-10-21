@@ -899,6 +899,9 @@ pipeline {
 
 3. 환경 변수 관리
 
+4. Python, Vue Unit Test 추가
+
+
 <br/>
 
 ## 11. 회고록
