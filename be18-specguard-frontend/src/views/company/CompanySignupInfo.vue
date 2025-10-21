@@ -101,10 +101,9 @@
 import { reactive, computed, ref, watch, onMounted } from 'vue'
     import { useRouter } from 'vue-router'
 
-    // const API = `${(import.meta.env.VITE_API_URL ?? 'http://localhost:8080').replace(/\/$/,'')}/api/v1`
-    const API = `${(import.meta.env.VITE_API_URL)}.replace(/\/$/,'')}/api/v1`
+    const API = `${(import.meta.env.VITE_API_URL ?? 'http://localhost:8080').replace(/\/$/,'')}/api/v1`
 
-    console.log("3.0")
+    console.log("3.3")
     
     const router = useRouter()
     const form = reactive({
@@ -136,10 +135,7 @@ import { reactive, computed, ref, watch, onMounted } from 'vue'
         if (!isEmail(form.email)) { errors.email='이메일 형식이 올바르지 않습니다.'; return }
         ui.sending = true
         try {
-            const r = await applicantApi.post(`/verify/company/request`, 
-            { 
-                headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email: form.email }) 
-            })
+            const r = await fetch(`${API}/verify/company/request`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email: form.email }) })
             if (!r.ok) throw new Error()
             alert('인증번호를 이메일로 발송했습니다.')
         } catch (e) {
@@ -152,10 +148,7 @@ import { reactive, computed, ref, watch, onMounted } from 'vue'
         if (!/^\d{6,10}$/.test(form.code)) { alert('인증번호를 확인하세요.'); return }
         ui.confirming = true
         try {
-            const r = await applicantApi.post(`/verify/company/confirm`, 
-            { 
-                headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email: form.email, code: form.code }) 
-            })
+            const r = await fetch(`${API}/verify/company/confirm`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email: form.email, code: form.code }) })
             if (!r.ok) throw new Error()
             await loadEmailStatus()
             if (!emailVerified.value) throw new Error('verify-failed')

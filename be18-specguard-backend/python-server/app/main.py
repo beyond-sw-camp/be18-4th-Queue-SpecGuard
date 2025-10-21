@@ -7,7 +7,7 @@ import sys, asyncio
 from dotenv import load_dotenv; load_dotenv()
 from app.routers import summary, keywords   # ✅ keywords 라우터 추가
 
-app = FastAPI(title="SpecGuard Python API", version="1.3.1")
+app = FastAPI(title="SpecGuard Python API", version="1.3.3")
 
 # 라우터 등록
 app.include_router(summary.router)
