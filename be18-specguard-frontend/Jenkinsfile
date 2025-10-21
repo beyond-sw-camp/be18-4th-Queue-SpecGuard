@@ -36,16 +36,21 @@ pipeline {
     }
 
     stages {
-        // ==========================
-        // 1️⃣ 현재 Git Commit SHA 추출
-        // ==========================
-        stage('Get Commit SHA') {
+        stage('Detect Changes') {
             steps {
                 script {
+                    def changedFiles = sh(script: 'git diff --name-only HEAD~1', returnStdout: true).trim().split("\n")
+
+                    echo "Changed files:\n${changedFiles.join('\n')}"
+
                     // 현재 커밋 SHA 추출 (짧은 형태)
                     env.GIT_COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
 
                     echo "GIT_COMMIT : ${env.GIT_COMMIT}"
+
+                    env.SHOULD_BUILD_APP = changedFiles.any { it.startsWith("be18-specguard-frontend/") } ? "true" : "false"
+
+                    echo "env.SHOULD_BUILD_APP: ${env.SHOULD_BUILD_APP}"
                 }
             }
         }
@@ -64,6 +69,11 @@ pipeline {
         }
 
         stage('Image Build & Push - Frontend') {
+            when {
+                expression {
+                    return env.SHOULD_BUILD_APP == "true"
+                }
+            }
             steps {
                 container('docker') {
                     script {
