@@ -83,7 +83,6 @@
 </template>
 
 <script setup>
-import applicantApi from '@/api/applicantApi'
 import { ref, computed, onMounted, onBeforeUnmount, reactive, watch } from 'vue'
 
 const STORAGE_KEY = 'specguard.applicant.email.verified'
@@ -124,9 +123,10 @@ async function requestCode() {
     console.log("requestCode email:", email.value)
     
     try {
-        const r = applicantApi.post(`${API}/verify/applicant/request`, {
-            headers: { 'Content-Type':'application/json' },
-            body: JSON.stringify({ email: email.value }) // 회원가입 단계: resumeId 없음
+        const r = await fetch(`${API}/verify/applicant/request`, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ email: email.value }) // 회원가입 단계: resumeId 없음
         })
         if (!r.ok) throw new Error('request-failed')
         status.value = 'SENT'
@@ -145,7 +145,8 @@ async function confirmCode() {
     if (!/^\d{6}$/.test(code.value)) { alert('6자리 인증번호를 입력하세요.'); return }
     ui.confirming = true
     try {
-        const r = await applicantApi.post(`/verify/applicant/confirm`, {
+        const r = await fetch(`${API}/verify/applicant/confirm`, {
+        method:'POST',
         headers:{ 'Content-Type':'application/json' },
         body: JSON.stringify({ email: email.value, code: code.value })
         })
