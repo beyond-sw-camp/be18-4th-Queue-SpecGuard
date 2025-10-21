@@ -1,0 +1,147 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: jenkins-agent
+            spec:
+              containers:
+              - name: node
+                image: node:20-alpine
+                command:
+                - cat
+                tty: true
+              - name: docker
+                image: docker:28.5.1-cli-alpine3.22
+                command:
+                - cat
+                tty: true
+                volumeMounts:
+                - mountPath: "/var/run/docker.sock"
+                  name: docker-socket
+              volumes:
+              - name: docker-socket
+                hostPath:
+                  path: "/var/run/docker.sock"
+            '''
+        }
+    }
+
+    environment {
+        DOCKER_IMAGE_NAME_FE = 'kimeodml/specguard-frontend'
+        DOCKER_CREDENTIALS_ID = 'dockerhub-access'
+        DISCORD_WEBHOOK_CREDENTIALS_ID = 'specguard-frontend-webhook'
+    }
+
+    stages {
+        stage('Detect Changes') {
+            steps {
+                script {
+                    def changedFiles = sh(script: 'git diff --name-only HEAD~1', returnStdout: true).trim().split("\n")
+
+                    echo "Changed files:\n${changedFiles.join('\n')}"
+
+                    // 현재 커밋 SHA 추출 (짧은 형태)
+                    env.GIT_COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+
+                    echo "GIT_COMMIT : ${env.GIT_COMMIT}"
+
+                    env.SHOULD_BUILD_APP = changedFiles.any { it.startsWith("be18-specguard-frontend/") } ? "true" : "false"
+
+                    echo "env.SHOULD_BUILD_APP: ${env.SHOULD_BUILD_APP}"
+                }
+            }
+        }
+
+        stage('Frontend Build') {
+            steps {
+                container('node') {
+                    dir('be18-specguard-frontend') {
+                        sh '''
+                            npm install
+                            npm run build
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Image Build & Push - Frontend') {
+            when {
+                expression {
+                    return env.SHOULD_BUILD_APP == "true"
+                }
+            }
+            steps {
+                container('docker') {
+                    script {
+                        def buildNumber = "${env.GIT_COMMIT}"
+
+                        sh 'docker logout'
+
+                        withCredentials([usernamePassword(
+                            credentialsId: DOCKER_CREDENTIALS_ID,
+                            usernameVariable: 'DOCKER_USERNAME',
+                            passwordVariable: 'DOCKER_PASSWORD'
+                        )]) {
+                            sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                        }
+
+                        withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
+                            dir('be18-specguard-frontend') {
+                                sh 'docker -v'
+                                sh 'echo $DOCKER_IMAGE_NAME_FE:$DOCKER_IMAGE_VERSION'
+                                sh 'docker build --no-cache -t $DOCKER_IMAGE_NAME_FE:$DOCKER_IMAGE_VERSION ./'
+                                sh 'docker image inspect $DOCKER_IMAGE_NAME_FE:$DOCKER_IMAGE_VERSION'
+                                sh 'docker push $DOCKER_IMAGE_NAME_FE:$DOCKER_IMAGE_VERSION'
+                            }
+                            
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Trigger specguard-frontend-manifests') {
+            steps {
+                script {
+                    def buildNumber = "${env.GIT_COMMIT}"
+
+                    withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
+                        build job: 'specguard-frontend-manifests', 
+                        parameters: [
+                            string(name: 'DOCKER_IMAGE_VERSION', value: "${DOCKER_IMAGE_VERSION}"),
+                            string(name: 'DID_BUILD_APP', value: "${env.SHOULD_BUILD_APP}")
+                        ], 
+                        wait: true
+                    }
+                    
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            withCredentials([string(
+                credentialsId: DISCORD_WEBHOOK_CREDENTIALS_ID,
+                variable: 'DISCORD_WEBHOOK_URL'
+            )]) {
+                discordSend description: """
+                💡 **SpecGuard Frontend CI/CD 알림**
+                🔹 Job : ${env.JOB_NAME}
+                🔹 Build : ${currentBuild.displayName}
+                🔹 Commit : ${env.GIT_COMMIT}
+                🔹 결과 : ${currentBuild.currentResult}
+                🔹 실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "SpecGuard FE Pipeline : ${env.GIT_COMMIT}",
+                webhookURL: "${DISCORD_WEBHOOK_URL}"
+            }
+
+        }
+    }
+}

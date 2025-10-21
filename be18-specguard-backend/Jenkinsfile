@@ -1,0 +1,189 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            metadata:
+                name: jenkins-agent
+            spec:
+                containers:
+                -   name: gradle
+                    image: gradle:8.5-jdk21-alpine
+                    command: ["cat"]
+                    tty: true
+                -   name: docker
+                    image: docker:27.2.0-alpine3.20
+                    command: ["cat"]
+                    tty: true
+                    volumeMounts:
+                    -   name: docker-socket
+                        mountPath: "/var/run/docker.sock"
+                volumes:
+                -   name: docker-socket
+                    hostPath:
+                        path: "/var/run/docker.sock"
+            '''
+        }
+    }
+
+    environment {
+        JAVA_IMAGE_NAME = 'viroovr/specguard-api'
+        PYTHON_IMAGE_NAME = 'viroovr/specguard-nlp'
+        JAVA_DIR = 'be18-specguard-backend/backend'
+        PYTHON_DIR = 'be18-specguard-backend/python-server'
+
+        DISCORD_WEBHOOK_CREDENTIALS_ID = 'specguard-backend-webhook'
+        DOCKER_CREDENTIALS_ID = 'dockerhub-access'
+    }
+
+    stages {
+        stage('Detect Changes') {
+            steps {
+                script {
+                    // 현재 커밋과 이전 커밋(HEAD~1) 간의 변경 파일을 가져온다.
+                    def changedFiles = sh(script: 'git diff --name-only HEAD~1', returnStdout: true).trim().split("\n")
+
+                    // 전체 배열을 줄바꿈으로 출력
+                    echo "Changed files:\n${changedFiles.join('\n')}"
+
+                    // 현재 커밋 SHA 추출 (짧은 형태)
+                    env.GIT_COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+
+                    echo "GIT_COMMIT : ${env.GIT_COMMIT}"
+
+                    // 환경 변수 동적 설정
+                    env.SHOULD_BUILD_JAVA = changedFiles.any { it.startsWith(JAVA_DIR) } ? "true" : "false"
+                    env.SHOULD_BUILD_PYTHON  = changedFiles.any { it.startsWith(PYTHON_DIR) } ? "true" : "false"
+
+                    echo "SHOULD_BUILD_JAVA : ${SHOULD_BUILD_JAVA}"
+                    echo "SHOULD_BUILD_PYTHON : ${SHOULD_BUILD_PYTHON}"
+                }
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                container('docker') {
+                    sh 'docker logout || true'
+
+                    withCredentials([usernamePassword(
+                        credentialsId: DOCKER_CREDENTIALS_ID,
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                    }
+                }
+            }
+        }
+
+        // ===============================
+        // 단위 테스트 Stage 추가
+        // ===============================
+        stage('Unit Test (Java)') {
+            when {
+                expression { env.SHOULD_BUILD_JAVA == "true" }
+            }
+            steps {
+                container('gradle') {
+                    dir(JAVA_DIR) {
+                        sh 'chmod +x gradlew'
+                        sh './gradlew clean test'
+                    }
+                }
+            }
+        }
+
+        stage('Java Image Build & Push') {
+            when {
+                expression {
+                    return env.SHOULD_BUILD_JAVA == "true"
+                }
+            }
+
+            steps {
+                container('docker') {
+                    dir(JAVA_DIR) {
+                        script {
+                        def buildNumber = "${env.GIT_COMMIT}"
+
+                        withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
+                                sh 'docker -v'
+                                sh 'echo $JAVA_IMAGE_NAME:$DOCKER_IMAGE_VERSION'
+                                sh 'docker build --no-cache -t $JAVA_IMAGE_NAME:$DOCKER_IMAGE_VERSION ./'
+                                sh 'docker image inspect $JAVA_IMAGE_NAME:$DOCKER_IMAGE_VERSION'
+                                sh 'docker push $JAVA_IMAGE_NAME:$DOCKER_IMAGE_VERSION'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Python Image Build & Push') {
+            when {
+                expression {
+                    return env.SHOULD_BUILD_PYTHON == "true"
+                }
+            }
+
+            steps {
+                container('docker') {
+                    dir(PYTHON_DIR) {
+                        script {
+                            def buildNumber = "${env.GIT_COMMIT}"
+
+                            withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
+                                sh 'docker -v'
+                                sh 'echo $PYTHON_IMAGE_NAME:$DOCKER_IMAGE_VERSION'
+                                sh 'docker build --no-cache -t $PYTHON_IMAGE_NAME:$DOCKER_IMAGE_VERSION ./'
+                                sh 'docker image inspect $PYTHON_IMAGE_NAME:$DOCKER_IMAGE_VERSION'
+                                sh 'docker push $PYTHON_IMAGE_NAME:$DOCKER_IMAGE_VERSION'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Trigger specguard-backend-manifests job') {
+            steps {
+                script {
+                    def buildNumber = "${env.GIT_COMMIT}"
+
+                    withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
+                        build job: 'specguard-backend-manifests',
+                        parameters: [
+                            string(name: 'DOCKER_IMAGE_VERSION', value: buildNumber),
+                            string(name: 'DID_BUILD_JAVA', value: "${env.SHOULD_BUILD_JAVA}"),
+                            string(name: 'DID_BUILD_PYTHON', value: "${env.SHOULD_BUILD_PYTHON}")
+                        ],
+                        wait: true
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            withCredentials([string(
+                credentialsId: DISCORD_WEBHOOK_CREDENTIALS_ID, 
+                variable: 'DISCORD_WEBHOOK_URL'
+            )]) {
+                discordSend description: """
+                💡 **SpecGuard Backend CI/CD 알림**
+                🔹 Job : ${env.JOB_NAME}
+                🔹 Build : ${currentBuild.displayName}
+                🔹 Commit : ${env.GIT_COMMIT}
+                🔹 결과 : ${currentBuild.currentResult}
+                🔹 실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "SpecGuard BE Pipeline : ${env.GIT_COMMIT}",
+                webhookURL: "${DISCORD_WEBHOOK_URL}"
+            }
+        }
+    }
+}

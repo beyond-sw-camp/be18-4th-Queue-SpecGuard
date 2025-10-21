@@ -1,0 +1,55 @@
+# === Poetry / Python 빌드 산출물 ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# 빌드/배포 관련
+dist/
+build/
+
+# === Poetry 환경 ===
+.poetry/
+.venv/
+
+# === IDE 관련 ===
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# === Git 관련 ===
+.git/
+.gitignore
+.gitattributes
+README.md
+
+# 테스트, 문서 등 런타임에 불필요한 파일
+tests/
+docs/
+
+# === OS/에디터 캐시 ===
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# === 로그 / 임시파일 ===
+*.log
+logs/
+tmp/
+.cache/
+
+# === 환경 설정 / 시크릿 ===
+.env
+*.env
+.env.local
+application-*.yml
+application-*.json
+
+# === Docker 관련 ===
+Dockerfile*
+docker-compose.yml
+.dockerignore
