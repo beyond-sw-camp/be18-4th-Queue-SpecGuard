@@ -875,6 +875,10 @@ pipeline {
 <li>ArgoCD</li>
 
 <details>
+<p>Synchronization</p>
+
+![CD 결과](docs/images/frontend-sync.png)
+
 
 <p>Logs</p>
 
