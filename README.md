@@ -799,9 +799,10 @@ pipeline {
 
 ### 9-7. 결과 <br>
 
-<ol> 
-Backend
+<details>
+<summary>Backend</summary>
 
+<ol> 
 <li>CI Job</li>
 
 <details>
@@ -821,6 +822,50 @@ Backend
 
 <details>
 
+- Synchronization
+
+[![시연 영상](docs/images/backend-argocd-sync.png)](https://drive.google.com/file/d/1EdJWIISSqq8YA9R-d4qaMKZ4HF8zOa9b/view?usp=drive_link)
+
+- Logs
+
+[![시연 영상](docs/images/backend-argocd-logs.png)](https://drive.google.com/file/d/18NsASmSKN77Ar55w7YD4bxl67-HwAn4_/view?usp=drive_link)
+
+</details>
+
+<li>Discord</li>
+<details>
+
+![backend-discord](docs/images/backend-discord.png)
+
+</details>
+</ol>
+</details>
+
+<details>
+<summary>Frontend</summary>
+
+<ol> 
+<li>CI Job
+
+<details>
+
+[![시연 영상](docs/images/backend-ci.png)](https://drive.google.com/file/d/1AD4i5wiX06Rrx-VUvl_M2WNxuPzg9Qbk/view?usp=drive_link)
+</details>
+</li>
+
+<li>Manifest</li>
+
+<details>
+
+[![시연 영상](docs/images/backend-manifest.png)](https://drive.google.com/file/d/1q8ckzNxokM1mwmGZNm3i2PZw4gf9Jeek/view?usp=drive_link)
+
+
+</details>
+
+<li>ArgoCD</li>
+
+<details>
+
 <p>Synchronization</p>
 
 [![시연 영상](docs/images/backend-argocd-sync.png)](https://drive.google.com/file/d/1EdJWIISSqq8YA9R-d4qaMKZ4HF8zOa9b/view?usp=drive_link)
@@ -832,7 +877,7 @@ Backend
 </details>
 
 </ol>
-
+</details>
 
 
 ### 9-8. 결론 <br>
