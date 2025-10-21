@@ -849,7 +849,7 @@ pipeline {
 
 <details>
 
-[![시연 영상](docs/images/backend-ci.png)](https://drive.google.com/file/d/1AD4i5wiX06Rrx-VUvl_M2WNxuPzg9Qbk/view?usp=drive_link)
+[![시연 영상](docs/images/frontend-ci.png)](https://drive.google.com/file/d/191bZVFRl94CjL3hz2vczJ86swee5sZ3H/view?usp=drive_link)
 </details>
 </li>
 
@@ -857,7 +857,7 @@ pipeline {
 
 <details>
 
-[![시연 영상](docs/images/backend-manifest.png)](https://drive.google.com/file/d/1q8ckzNxokM1mwmGZNm3i2PZw4gf9Jeek/view?usp=drive_link)
+[![시연 영상](docs/images/frontend-manifest.png)](https://drive.google.com/file/d/1RhtZhgK1oD2XWz27hbbgomWsAfNBBtad/view?usp=drive_link)
 
 
 </details>
@@ -866,13 +866,16 @@ pipeline {
 
 <details>
 
-<p>Synchronization</p>
-
-[![시연 영상](docs/images/backend-argocd-sync.png)](https://drive.google.com/file/d/1EdJWIISSqq8YA9R-d4qaMKZ4HF8zOa9b/view?usp=drive_link)
-
 <p>Logs</p>
 
-[![시연 영상](docs/images/backend-argocd-logs.png)](https://drive.google.com/file/d/18NsASmSKN77Ar55w7YD4bxl67-HwAn4_/view?usp=drive_link)
+[![시연 영상](docs/images/frontend-argocd-logs.png)](https://drive.google.com/file/d/1eLUiSvpdv8ysXtmRdQa4Tpk8ateYko01/view?usp=drive_link)
+
+</details>
+
+<li>Discord</li>
+<details>
+
+![backend-discord](docs/images/frontend-discord.png)
 
 </details>
 
