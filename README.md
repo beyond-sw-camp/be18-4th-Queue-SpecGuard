@@ -2,8 +2,6 @@
   <img src="https://readme-typing-svg.demolab.com?font=Noto+Sans+KR&weight=900&size=48&duration=2300&pause=900&color=E1A925&background=00000000&center=true&vCenter=true&width=1000&lines=Queue;" alt="SpecGuard Typing">
 </p>
 
-# CI/CD 발표자료
-https://docs.google.com/presentation/d/1qshOqG2RWEBWa9YqodJfumGWBgeQHwxH4nFSYmgzR4k/edit?usp=sharing
 
 ## 👥팀원  
 
@@ -11,6 +9,10 @@ https://docs.google.com/presentation/d/1qshOqG2RWEBWa9YqodJfumGWBgeQHwxH4nFSYmgz
 | :---: | :---: | :---: | :---: | :---: |
 |  <img src="docs/images/서현원.jpg"  width="100"/> | <img src="docs/images/김택곤.jpg"  width="100"/>  |  <img src="docs/images/육세윤.jpg"  width="100"/>  |  <img src="docs/images/이인화.jpg"  width="100"/> | <img src="docs/images/김대의.jpg"  width="100"/>  |
 |<a href="https://github.com/viroovr" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | <a href="https://github.com/dobbyRR" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | <a href="https://github.com/KorSwib" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | <a href="https://github.com/Inhwa1003" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | <a href="https://github.com/kimeodml" target="_blank"><img src="https://img.shields.io/badge/github-181717.svg?style=for-the-badge&logo=github&logoColor=white" /></a> | 
+
+
+### CI/CD 발표자료
+[발표자료](https://docs.google.com/presentation/d/1qshOqG2RWEBWa9YqodJfumGWBgeQHwxH4nFSYmgzR4k/edit?usp=sharing)
 
 ## 📚 목차
 
@@ -184,23 +186,33 @@ https://docs.google.com/presentation/d/1qshOqG2RWEBWa9YqodJfumGWBgeQHwxH4nFSYmgz
 <br>
 
 ## 9. CI/CD 절차
-### 9-1. 개요 <br>
-프로젝트명: SpecGuard <br>
-프로젝트 유형: 이력서·경력 자동검증 서비스 (Spring Boot + MariaDB + Docker 기반)<br>
-DevOps 목표: 코드 배포 자동화, 안정적 버전관리, 서비스 무중단 운영
+
+### 9-1. 목표
+
 <br>
+
+코드 배포 자동화, 안정적 버전관리, 서비스 무중단 운영
+<br>
+
 ### 9-2. 기술 스택 및 선택 이유
-   
+
+<details>
+<summary>세부 내용</summary>
+
 | **구분**           | **기술**               | **선택 이유**                                                                                                                                   |
 | ---------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | **컨테이너 오케스트레이션** | **Kubernetes (k8s)** | - Docker 컨테이너의 자동 배포 및 스케일링<br>- Pod 단위 격리로 서비스 안정성 확보<br>- 무중단 롤링 업데이트 및 헬스체크 지원                     |
 | **CI 서버**        | **Jenkins**          | - 오픈소스 CI 툴로 커스터마이징 용이<br>- Spring Boot, Gradle, Docker와 높은 호환성<br>- 파이프라인 스크립트를 통한 유연한 빌드/테스트 자동화<br>- GitHub Webhook 기반 자동 빌드 트리거 가능      |
 | **CD 툴**         | **ArgoCD**           | - GitOps 방식의 CD 지원 (Git 상태 = 실제 배포 상태)<br>- k8s 리소스 변경 자동 감지 및 동기화<br>- UI를 통한 배포 상태 모니터링 및 롤백 지원<br>- Jenkins와의 연동으로 배포 승인/자동화 파이프라인 구성 가능 |
+</details>
 
 
 ### 9-3. CI/CD 파이프라인 절차
 
 #### (1) CI 단계 (Continuous Integration) – Jenkins
+
+<details>
+<summary>세부 내용</summary>
 
 1. 개발자가 코드 푸시 → GitHub Webhook Trigger  
  - develop, main 브랜치 기준으로 자동 감지
@@ -220,19 +232,13 @@ DevOps 목표: 코드 배포 자동화, 안정적 버전관리, 서비스 무중
 4. 도커 허브 푸시  
  - Jenkins Credential을 이용해 DockerHub로 이미지 업로드
 
-```groovy
-stage('Build & Push') {
-    sh 'docker build -t viroovr/specguard-api:${GIT_COMMIT} .'
-    sh 'docker push viroovr/specguard-api:${GIT_COMMIT}'
+</details>
 
-    sh 'docker build -t viroovr/specguard-nlp:${GIT_COMMIT} .'
-    sh 'docker push viroovr/specguard-nlp:${GIT_COMMIT}'
-
-    sh 'docker build -t kimeodml/specguard-frontend:${GIT_COMMIT} .'
-    sh 'docker push kimeodml/specguard-frontend:${GIT_COMMIT}'
-}
-```
 #### (2) CD 단계 (Continuous Deployment) – ArgoCD + Kubernetes <br>
+
+<details>
+<summary>세부 내용</summary>
+
 1. **ArgoCD가 GitOps Repository 모니터링**
  - GitHub Repository: [specguard-k8s-manifests](https://github.com/kimeodml/specguard-k8s-manifests)
  - 모니터링 디렉토리 구조:
@@ -253,16 +259,12 @@ stage('Build & Push') {
   - ArgoCD UI에서 Pod 상태, Sync 상태 확인 <br>
   - 실패 시 이전 리비전으로 원클릭 롤백 가능 <br>
 4. Argo CD 레포
-
-<details>
-<summary>Argo CD 레포 링크</summary>
-
-[Argo CD 레포 바로가기](https://www.notion.so/CI-CD-292819b5e8c680c78d53fa140f580c25?d=292819b5e8c680dcb63d001c63e194ce&source=copy_link#9aa5f72c33064e0489dba5b6c44849ae)
-
 </details>
 
-
 ### 9-4. 장단점 분석
+
+<details>
+<summary>세부 내용</summary>
 
 | **구분**         | **장점**                                                             | **단점**                                        |
 | -------------- | ------------------------------------------------------------------ | --------------------------------------------- |
@@ -270,15 +272,618 @@ stage('Build & Push') {
 | **Jenkins**    | - 플러그인 다양성<br>- 완전한 빌드 자동화<br>- Webhook 실시간 트리거 가능                 | - UI/구성 복잡<br>- 별도 관리 서버 필요                   |
 | **ArgoCD**     | - GitOps 기반 선언적 배포<br>- 롤백 용이<br>- 실시간 배포 모니터링                     | - 초기 설정 난이도 높음<br>- Git 상태와 실제 배포 불일치 시 혼란 가능 |
 
+</details>
+
+
 ### 9-5. 전체 아키텍처 흐름 <br>
   [개발자] → GitHub → Jenkins (CI) <br>
   → Docker Build & Push → GitOps Repo 업데이트 <br>
   → ArgoCD (CD) → Kubernetes Cluster 배포
 <br>
-  CI/CD 흐름 요약: <br>
-  - Git Push 시 자동 빌드 → 이미지 생성/업로드 → k8s 매니페스트 반영 → 자동 배포/모니터링
 
-### 9-6. 결론 <br>
+### 9-6. 코드 <br>
+<ol>
+<li>Pipe Line Code</li>
+<details>
+<summary>Backend PipeLine</summary>
+
+```groovy
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            metadata:
+                name: jenkins-agent
+            spec:
+                containers:
+                -   name: gradle
+                    image: gradle:8.5-jdk21-alpine
+                    command: ["cat"]
+                    tty: true
+                -   name: docker
+                    image: docker:27.2.0-alpine3.20
+                    command: ["cat"]
+                    tty: true
+                    volumeMounts:
+                    -   name: docker-socket
+                        mountPath: "/var/run/docker.sock"
+                volumes:
+                -   name: docker-socket
+                    hostPath:
+                        path: "/var/run/docker.sock"
+            '''
+        }
+    }
+
+    environment {
+        JAVA_IMAGE_NAME = 'viroovr/specguard-api'
+        PYTHON_IMAGE_NAME = 'viroovr/specguard-nlp'
+        JAVA_DIR = 'be18-specguard-backend/backend'
+        PYTHON_DIR = 'be18-specguard-backend/python-server'
+
+        DISCORD_WEBHOOK_CREDENTIALS_ID = 'specguard-backend-webhook'
+        DOCKER_CREDENTIALS_ID = 'dockerhub-access'
+    }
+
+    stages {
+        stage('Detect Changes') {
+            steps {
+                script {
+                    // 현재 커밋과 이전 커밋(HEAD~1) 간의 변경 파일을 가져온다.
+                    def changedFiles = sh(script: 'git diff --name-only HEAD~1', returnStdout: true).trim().split("\n")
+
+                    // 전체 배열을 줄바꿈으로 출력
+                    echo "Changed files:\n${changedFiles.join('\n')}"
+
+                    // 현재 커밋 SHA 추출 (짧은 형태)
+                    env.GIT_COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+
+                    echo "GIT_COMMIT : ${env.GIT_COMMIT}"
+
+                    // 환경 변수 동적 설정
+                    env.SHOULD_BUILD_JAVA = changedFiles.any { it.startsWith(JAVA_DIR) } ? "true" : "false"
+                    env.SHOULD_BUILD_PYTHON  = changedFiles.any { it.startsWith(PYTHON_DIR) } ? "true" : "false"
+
+                    echo "SHOULD_BUILD_JAVA : ${SHOULD_BUILD_JAVA}"
+                    echo "SHOULD_BUILD_PYTHON : ${SHOULD_BUILD_PYTHON}"
+                }
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                container('docker') {
+                    sh 'docker logout || true'
+
+                    withCredentials([usernamePassword(
+                        credentialsId: DOCKER_CREDENTIALS_ID,
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                    }
+                }
+            }
+        }
+
+        // ===============================
+        // 단위 테스트 Stage 추가
+        // ===============================
+        stage('Unit Test (Java)') {
+            when {
+                expression { env.SHOULD_BUILD_JAVA == "true" }
+            }
+            steps {
+                container('gradle') {
+                    dir(JAVA_DIR) {
+                        sh 'chmod +x gradlew'
+                        sh './gradlew clean test'
+                    }
+                }
+            }
+        }
+
+        stage('Java Image Build & Push') {
+            when {
+                expression {
+                    return env.SHOULD_BUILD_JAVA == "true"
+                }
+            }
+
+            steps {
+                container('docker') {
+                    dir(JAVA_DIR) {
+                        script {
+                        def buildNumber = "${env.GIT_COMMIT}"
+
+                        withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
+                                sh 'docker -v'
+                                sh 'echo $JAVA_IMAGE_NAME:$DOCKER_IMAGE_VERSION'
+                                sh 'docker build --no-cache -t $JAVA_IMAGE_NAME:$DOCKER_IMAGE_VERSION ./'
+                                sh 'docker image inspect $JAVA_IMAGE_NAME:$DOCKER_IMAGE_VERSION'
+                                sh 'docker push $JAVA_IMAGE_NAME:$DOCKER_IMAGE_VERSION'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Python Image Build & Push') {
+            when {
+                expression {
+                    return env.SHOULD_BUILD_PYTHON == "true"
+                }
+            }
+
+            steps {
+                container('docker') {
+                    dir(PYTHON_DIR) {
+                        script {
+                            def buildNumber = "${env.GIT_COMMIT}"
+
+                            withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
+                                sh 'docker -v'
+                                sh 'echo $PYTHON_IMAGE_NAME:$DOCKER_IMAGE_VERSION'
+                                sh 'docker build --no-cache -t $PYTHON_IMAGE_NAME:$DOCKER_IMAGE_VERSION ./'
+                                sh 'docker image inspect $PYTHON_IMAGE_NAME:$DOCKER_IMAGE_VERSION'
+                                sh 'docker push $PYTHON_IMAGE_NAME:$DOCKER_IMAGE_VERSION'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Trigger specguard-backend-manifests job') {
+            steps {
+                script {
+                    def buildNumber = "${env.GIT_COMMIT}"
+
+                    withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
+                        build job: 'specguard-backend-manifests',
+                        parameters: [
+                            string(name: 'DOCKER_IMAGE_VERSION', value: buildNumber),
+                            string(name: 'DID_BUILD_JAVA', value: "${env.SHOULD_BUILD_JAVA}"),
+                            string(name: 'DID_BUILD_PYTHON', value: "${env.SHOULD_BUILD_PYTHON}")
+                        ],
+                        wait: true
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            withCredentials([string(
+                credentialsId: DISCORD_WEBHOOK_CREDENTIALS_ID, 
+                variable: 'DISCORD_WEBHOOK_URL'
+            )]) {
+                discordSend description: """
+                💡 **SpecGuard Backend CI/CD 알림**
+                🔹 Job : ${env.JOB_NAME}
+                🔹 Build : ${currentBuild.displayName}
+                🔹 Commit : ${env.GIT_COMMIT}
+                🔹 결과 : ${currentBuild.currentResult}
+                🔹 실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "SpecGuard BE Pipeline : ${env.GIT_COMMIT}",
+                webhookURL: "${DISCORD_WEBHOOK_URL}"
+            }
+        }
+    }
+}
+
+```
+</details>
+
+<details>
+<summary>Frontend PipeLine</summary>
+
+```groovy
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: jenkins-agent
+            spec:
+              containers:
+              - name: node
+                image: node:20-alpine
+                command:
+                - cat
+                tty: true
+              - name: docker
+                image: docker:28.5.1-cli-alpine3.22
+                command:
+                - cat
+                tty: true
+                volumeMounts:
+                - mountPath: "/var/run/docker.sock"
+                  name: docker-socket
+              volumes:
+              - name: docker-socket
+                hostPath:
+                  path: "/var/run/docker.sock"
+            '''
+        }
+    }
+
+    environment {
+        DOCKER_IMAGE_NAME_FE = 'kimeodml/specguard-frontend'
+        DOCKER_CREDENTIALS_ID = 'dockerhub-access'
+        DISCORD_WEBHOOK_CREDENTIALS_ID = 'specguard-frontend-webhook'
+    }
+
+    stages {
+        // ==========================
+        // 1️⃣ 현재 Git Commit SHA 추출
+        // ==========================
+        stage('Get Commit SHA') {
+            steps {
+                script {
+                    // 현재 커밋 SHA 추출 (짧은 형태)
+                    env.GIT_COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+
+                    echo "GIT_COMMIT : ${env.GIT_COMMIT}"
+                }
+            }
+        }
+
+        stage('Frontend Build') {
+            steps {
+                container('node') {
+                    dir('be18-specguard-frontend') {
+                        sh '''
+                            npm install
+                            npm run build
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Image Build & Push - Frontend') {
+            steps {
+                container('docker') {
+                    script {
+                        def buildNumber = "${env.GIT_COMMIT}"
+
+                        sh 'docker logout'
+
+                        withCredentials([usernamePassword(
+                            credentialsId: DOCKER_CREDENTIALS_ID,
+                            usernameVariable: 'DOCKER_USERNAME',
+                            passwordVariable: 'DOCKER_PASSWORD'
+                        )]) {
+                            sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                        }
+
+                        withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
+                            dir('be18-specguard-frontend') {
+                                sh 'docker -v'
+                                sh 'echo $DOCKER_IMAGE_NAME_FE:$DOCKER_IMAGE_VERSION'
+                                sh 'docker build --no-cache -t $DOCKER_IMAGE_NAME_FE:$DOCKER_IMAGE_VERSION ./'
+                                sh 'docker image inspect $DOCKER_IMAGE_NAME_FE:$DOCKER_IMAGE_VERSION'
+                                sh 'docker push $DOCKER_IMAGE_NAME_FE:$DOCKER_IMAGE_VERSION'
+                            }
+                            
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Trigger specguard-frontend-manifests') {
+            steps {
+                script {
+                    def buildNumber = "${env.GIT_COMMIT}"
+
+                    withEnv(["DOCKER_IMAGE_VERSION=${buildNumber}"]) {
+                        build job: 'specguard-frontend-manifests', 
+                        parameters: [
+                            string(name: 'DOCKER_IMAGE_VERSION', value: "${DOCKER_IMAGE_VERSION}"),
+                            string(name: 'DID_BUILD_APP', value: "${env.SHOULD_BUILD_APP}")
+                        ], 
+                        wait: true
+                    }
+                    
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            withCredentials([string(
+                credentialsId: DISCORD_WEBHOOK_CREDENTIALS_ID,
+                variable: 'DISCORD_WEBHOOK_URL'
+            )]) {
+                discordSend description: """
+                💡 **SpecGuard Frontend CI/CD 알림**
+                🔹 Job : ${env.JOB_NAME}
+                🔹 Build : ${currentBuild.displayName}
+                🔹 Commit : ${env.GIT_COMMIT}
+                🔹 결과 : ${currentBuild.currentResult}
+                🔹 실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "SpecGuard FE Pipeline : ${env.GIT_COMMIT}",
+                webhookURL: "${DISCORD_WEBHOOK_URL}"
+            }
+
+        }
+    }
+}
+```
+
+</details>
+
+<li>Manifest Code</li>
+<details>
+<summary>Backend Manifest</summary>
+
+```groovy
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'DOCKER_IMAGE_VERSION', defaultValue: '', description: 'Docker Image Version')
+        string(name: 'DID_BUILD_JAVA', defaultValue: '', description: 'Java Builded boolean')
+        string(name: 'DID_BUILD_PYTHON', defaultValue: '', description: 'Python Builded boolean')
+    }
+
+    
+    stages {
+        stage('Checkout Main Branches') {
+            steps {
+                sh 'git checkout main'
+                echo "DOCKER_IMAGE_VERSION: ${params.DOCKER_IMAGE_VERSION}"
+                echo "DID_BUILD_JAVA: ${params.DID_BUILD_JAVA}"
+                echo "DID_BUILD_PYTHON: ${params.DID_BUILD_PYTHON}"
+            }
+        }
+
+        stage('update Python deploy.yaml') {
+            when {
+                expression {
+                    return params.DID_BUILD_PYTHON == "true"
+                }
+            }
+
+            steps {
+                // Jenkins 파이프라인에서 작업 디렉터리를 변경할 때 사용한다.
+                dir('specguard-backend/python') {
+                    sh 'pwd'
+                    sh 'ls -al'
+                    echo "Received Docker Image Version : ${params.DOCKER_IMAGE_VERSION}"
+                    sh 'git checkout main'
+                    sh "sed -i 's|viroovr/specguard-nlp:.*|viroovr/specguard-nlp:${params.DOCKER_IMAGE_VERSION}|g' deploy.yaml"
+                    sh 'cat deploy.yaml'
+                }
+            }
+        }
+
+        stage('update Java deploy.yaml') {
+            when {
+                expression {
+                    return params.DID_BUILD_JAVA == "true"
+                }
+            }
+
+            steps {
+                // Jenkins 파이프라인에서 작업 디렉터리를 변경할 때 사용한다.
+                dir('specguard-backend/java') {
+                    sh 'pwd'
+                    sh 'ls -al'
+                    echo "Received Docker Image Version : ${params.DOCKER_IMAGE_VERSION}"
+                    sh 'git checkout main'
+                    sh "sed -i 's|viroovr/specguard-api:.*|viroovr/specguard-api:${params.DOCKER_IMAGE_VERSION}|g' deploy.yaml"
+                    sh 'cat deploy.yaml'
+                }
+            }
+        }
+
+        stage('Commit & Push') {
+            when {
+                expression {
+                    return params.DID_BUILD_PYTHON == "true" || params.DID_BUILD_JAVA == "true"
+                }
+            }
+
+            steps {
+                sh 'git config --list'
+                sh 'git config user.name "jenkins"'
+                sh 'git config user.email "jenkins@beyond.com"'
+
+            // 변경된 파일 있는지 확인
+            script {
+                def changes = sh(script: "git status --porcelain", returnStdout: true).trim()
+                if (changes) {
+                    echo "🔹 변경 사항 감지됨 → 커밋 및 푸시 실행"
+
+                    sh 'git add .'
+                    sh "git commit -m '[Auto] update image version ${params.DOCKER_IMAGE_VERSION}'"
+                    
+                    sshagent(['specguard-k8s-manifests']) {
+                        sh 'git push origin main'
+                    }
+                } else {
+                    echo "⚪ 변경 사항 없음 → 커밋/푸시 생략"
+                }
+            }
+        }
+    }
+    }
+}
+
+```
+</details>
+
+<details>
+<summary>Frontend Manifest</summary>
+
+```groovy
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'DOCKER_IMAGE_VERSION', defaultValue: '', description: 'Docker Image Version')
+        string(name: 'DID_BUILD_APP', defaultValue: '', description: 'Did Build APP')
+    }
+
+    stages {
+        stage('Checkout Main Branches') {
+            steps {
+                sh 'git checkout main'
+                echo "DOCKER_IMAGE_VERSION: ${params.DOCKER_IMAGE_VERSION}"
+            }
+        }
+
+        stage('update Vue deploy.yaml') {
+            steps {
+                // Jenkins 파이프라인에서 작업 디렉터리를 변경할 때 사용한다.
+                dir('specguard-frontend') {
+                    sh 'pwd'
+                    sh 'ls -al'
+                    echo "Received Docker Image Version : ${params.DOCKER_IMAGE_VERSION}"
+                    sh "sed -i 's|kimeodml/specguard-frontend:.*|kimeodml/specguard-frontend:${params.DOCKER_IMAGE_VERSION}|g' deploy.yaml"
+                    sh 'cat deploy.yaml'
+                }
+            }
+        }
+
+        stage('Commit & Push') {
+            when {
+                expression {
+                    return params.DID_BUILD_APP == "true"
+                }
+            }
+            
+            steps {
+                sh 'git config user.name "jenkins"'
+                sh 'git config user.email "jenkins@beyond.com"'
+
+                // 변경된 파일 있는지 확인
+                script {
+                    def changes = sh(script: "git status --porcelain", returnStdout: true).trim()
+                    if (changes) {
+                        echo "🔹 변경 사항 감지됨 → 커밋 및 푸시 실행"
+
+                        sh 'git add .'
+                        sh "git commit -m '[Auto] update image version ${params.DOCKER_IMAGE_VERSION}'"
+                        
+                        sshagent(['specguard-k8s-manifests']) {
+                            sh 'git push origin main'
+                        }
+                    } else {
+                        echo "⚪ 변경 사항 없음 → 커밋/푸시 생략"
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+</details>
+
+</ol>
+
+### 9-7. 결과 <br>
+
+<details>
+<summary>Backend</summary>
+
+<ol> 
+<li>CI Job</li>
+
+<details>
+
+[![시연 영상](docs/images/backend-ci.png)](https://drive.google.com/file/d/1AD4i5wiX06Rrx-VUvl_M2WNxuPzg9Qbk/view?usp=drive_link)
+</details>
+
+<li>Manifest</li>
+
+<details>
+
+[![시연 영상](docs/images/backend-manifest.png)](https://drive.google.com/file/d/1q8ckzNxokM1mwmGZNm3i2PZw4gf9Jeek/view?usp=drive_link)
+
+</details>
+
+<li>ArgoCD</li>
+
+<details>
+
+- Synchronization
+
+[![시연 영상](docs/images/backend-argocd-sync.png)](https://drive.google.com/file/d/1EdJWIISSqq8YA9R-d4qaMKZ4HF8zOa9b/view?usp=drive_link)
+
+- Logs
+
+[![시연 영상](docs/images/backend-argocd-logs.png)](https://drive.google.com/file/d/18NsASmSKN77Ar55w7YD4bxl67-HwAn4_/view?usp=drive_link)
+
+</details>
+
+<li>Discord</li>
+<details>
+
+![backend-discord](docs/images/backend-discord.png)
+
+</details>
+</ol>
+</details>
+
+<details>
+<summary>Frontend</summary>
+
+<ol> 
+<li>CI Job
+
+<details>
+
+[![시연 영상](docs/images/frontend-ci.png)](https://drive.google.com/file/d/191bZVFRl94CjL3hz2vczJ86swee5sZ3H/view?usp=drive_link)
+</details>
+</li>
+
+<li>Manifest</li>
+
+<details>
+
+[![시연 영상](docs/images/frontend-manifest.png)](https://drive.google.com/file/d/1RhtZhgK1oD2XWz27hbbgomWsAfNBBtad/view?usp=drive_link)
+
+
+</details>
+
+<li>ArgoCD</li>
+
+<details>
+
+<p>Logs</p>
+
+[![시연 영상](docs/images/frontend-argocd-logs.png)](https://drive.google.com/file/d/1eLUiSvpdv8ysXtmRdQa4Tpk8ateYko01/view?usp=drive_link)
+
+</details>
+
+<li>Discord</li>
+<details>
+
+![backend-discord](docs/images/frontend-discord.png)
+
+</details>
+
+</ol>
+</details>
+
+
+### 9-8. 결론 <br>
   본 CI/CD 구조는 개발-테스트-배포의 전 과정을 자동화하여 <br>
     - 배포시간 단축, 버전 추적성 강화, 장애 발생 시 빠른 롤백 을 가능하게 한다.
 
@@ -288,11 +893,14 @@ stage('Build & Push') {
 
 ## 10. 향후 개선 계획
 
-1. 분석 정확도 개선을 위한 모델 업그레이드
+1. CI 시간 단축
 
-2. 적절한 에러처리
+2. 배포 방식 Blue-Green 등 결정
 
-3. 통계 및 리포트 페이지 구현
+3. 환경 변수 관리
+
+4. Python, Vue Unit Test 추가
+
 
 <br/>
 
